@@ -1,5 +1,6 @@
 import type { Work } from '@/model';
 import type { CountEntry } from './CountEntry';
+import type { CountOptions } from './CountOptions';
 import type { FacetField } from './FacetField';
 import { facetValues } from './facetValues';
 

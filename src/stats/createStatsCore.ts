@@ -1,10 +1,6 @@
 import type { NumberSummary } from './NumberSummary';
 import type { StatsCore } from './StatsCore';
-
-export type StatsCoreBindings = {
-    summarize(values: Float64Array): Float64Array;
-    histogram(values: Float64Array, edges: Float64Array): Uint32Array;
-};
+import type { StatsCoreBindings } from './StatsCoreBindings';
 
 /** Wraps the generated wasm bindings in typed functions. */
 export function createStatsCore(bindings: StatsCoreBindings): StatsCore {

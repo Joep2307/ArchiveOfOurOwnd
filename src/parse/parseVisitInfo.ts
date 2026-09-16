@@ -1,13 +1,6 @@
 import { parseAo3Date } from './parseAo3Date';
 import { textOf } from './textOf';
-
-export type VisitInfo = {
-    lastVisited: string | null;
-    visits: number;
-    updateAvailable: boolean;
-    markedForLater: boolean;
-    deleted: boolean;
-};
+import type { VisitInfo } from './VisitInfo';
 
 /** Reads the "Last visited … Visited N times" line of a blurb. */
 export function parseVisitInfo(item: Element, now: Date): VisitInfo {

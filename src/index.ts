@@ -5,6 +5,7 @@ export * as content from './content';
 export * as dashboard from './dashboard';
 export * as demo from './demo';
 export * as exporting from './export';
+export * as feedback from './feedback';
 export * as format from './format';
 export * as manifest from './manifest';
 export * as model from './model';

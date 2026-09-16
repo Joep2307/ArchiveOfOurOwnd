@@ -7,7 +7,7 @@ import {
 } from '@/storage';
 import { parseLibraryFile } from '@/export';
 import { loadCore } from './loadCore';
-import { reviewCandidates } from '@/stats/reviewCandidates';
+import { reviewCandidates } from '@/stats';
 import { formatCompact } from '@/format';
 
 async function openReview(root: HTMLElement): Promise<void> {

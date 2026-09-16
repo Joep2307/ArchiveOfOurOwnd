@@ -17,6 +17,10 @@ export const WORD_BUCKET_LABELS = [
 /** Average adult silent reading speed, words per minute. */
 export const WORDS_PER_MINUTE = 250;
 
+/** Range a personal reading speed is kept within. */
+export const MIN_WORDS_PER_MINUTE = 50;
+export const MAX_WORDS_PER_MINUTE = 1500;
+
 /** A typical novel, for the "that's N novels" comparison. */
 export const WORDS_PER_NOVEL = 90_000;
 

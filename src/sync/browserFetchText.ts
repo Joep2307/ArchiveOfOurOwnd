@@ -2,13 +2,14 @@ import { SyncError } from './SyncError';
 import type { FetchText } from './FetchText';
 
 /** `FetchText` using `fetch` with credentials. */
-export const browserFetchText: FetchText = async (url, signal) => {
+export const browserFetchText: FetchText = async (url, signal, headers) => {
     let response: Response;
     try {
         response = await fetch(url, {
             credentials: 'include',
             redirect: 'follow',
             ...(signal ? { signal } : {}),
+            ...(headers ? { headers } : {}),
         });
     } catch (error) {
         if (signal?.aborted) {

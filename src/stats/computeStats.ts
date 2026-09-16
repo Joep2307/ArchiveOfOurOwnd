@@ -61,6 +61,7 @@ export function computeStats(
     imported: readonly Work[],
     core: StatsCore,
     reviews: Record<string, ReadingReview> = {},
+    wordsPerMinute: number = WORDS_PER_MINUTE,
 ): Stats {
     // Preserve raw AO3 records; apply review snapshots only to statistics.
     const works = imported
@@ -135,7 +136,7 @@ export function computeStats(
                 (sum, work) => sum + work.chaptersPosted,
                 0,
             ),
-            readingMinutes: Math.round(words / WORDS_PER_MINUTE),
+            readingMinutes: Math.round(words / wordsPerMinute),
             novels: words / WORDS_PER_NOVEL,
             firstVisited,
             lastVisited,

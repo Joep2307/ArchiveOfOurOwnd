@@ -47,6 +47,11 @@ body {
             background: #363346;
             color: #ff9c8e;
         }
+
+        &[aria-current='page'] {
+            background: #fff6e8;
+            color: #a32e35;
+        }
     }
 
     .reading-rail__brand {
@@ -300,6 +305,24 @@ body {
 .tile:nth-child(3) .tile__value {
     font-size: clamp(24px, 2.5vw, 36px);
     line-height: 1.2;
+}
+
+// Genre tiles hold tag names, not just numbers.
+.tiles--compact {
+    margin-bottom: 18px;
+
+    .tile:nth-child(-n + 4) {
+        min-height: 150px;
+    }
+
+    .tile:nth-child(-n + 4) .tile__value {
+        font-size: clamp(22px, 2.2vw, 32px);
+        line-height: 1.15;
+    }
+}
+
+main:focus {
+    outline: none;
 }
 
 .menu__list {

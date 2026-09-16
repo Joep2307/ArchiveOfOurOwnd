@@ -48,9 +48,10 @@ addons.mozilla.org.)
   log in or grant access, then use **Sync now** to retry.
 
 - It reads `archiveofourown.org/users/<you>/readings`, one page at a
-  time, with a 1.5 second pause between pages. If AO3 says “slow
-  down”, it waits and tries again.
-- A big history (say 3,000 works = 150 pages) takes about 4 minutes.
+  time, with a 3 second pause between pages. If AO3 says “slow
+  down”, it waits, tries again, and keeps a slower pace for the rest
+  of that sync.
+- A big history (say 3,000 works = 150 pages) takes about 8 minutes.
   You can switch tabs, but keep the dashboard tab open.
 - The next sync only reads pages until it reaches works it already
   knows. Use **Options → Full re-sync** to refresh everything (for

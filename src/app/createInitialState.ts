@@ -1,9 +1,10 @@
-import { emptyFilter } from '@/stats';
+import { emptyFilter, WORDS_PER_MINUTE } from '@/stats';
 import type { DashboardState } from './DashboardState';
 
 export function createInitialState(standalone: boolean): DashboardState {
     return {
         library: undefined,
+        view: 'dashboard',
         demo: false,
         reviewOpen: false,
         reviewSessionAnswered: [],
@@ -16,5 +17,7 @@ export function createInitialState(standalone: boolean): DashboardState {
         lengthOrder: 'longest',
         theme: 'system',
         highlightOnAo3: true,
+        wordsPerMinute: WORDS_PER_MINUTE,
+        speedTest: { startedAt: null, result: null, tooFast: false },
     };
 }

@@ -46,9 +46,10 @@ export function renderSyncBanner(
                 el('span', {
                     className: 'muted',
                     text:
+                        progress?.detail ??
                         `${formatNumber(progress?.worksSeen ?? 0)} ` +
-                        'entries read so far. You can switch tabs, ' +
-                        'but keep this one open.',
+                            'entries read so far. You can switch tabs, ' +
+                            'but keep this one open.',
                 }),
             ),
             el(

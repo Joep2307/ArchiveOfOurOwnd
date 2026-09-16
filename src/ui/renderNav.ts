@@ -1,41 +1,40 @@
+import { DASHBOARD_VIEWS, viewHash } from '@/app';
+import { VIEW_LINKS } from './constants';
 import { el } from './el';
 
-const LINKS: [string, string, string][] = [
-    ['overview', 'Overview', '◈'],
-    ['time', 'Over time', '◷'],
-    ['shape', 'What you read', '▥'],
-    ['people', 'Favourites', '♡'],
-    ['standouts', 'Standouts', '✦'],
-    ['works', 'All works', '▤'],
-];
-
-/** Persistent reading-room navigation with accessible labels. */
+/** Persistent menu that switches between pages. */
 export function renderNav(): HTMLElement {
     return el(
         'nav',
         {
             className: 'reading-rail',
-            attrs: { 'aria-label': 'Sections' },
+            attrs: { 'aria-label': 'Pages' },
         },
         el('a', {
             className: 'reading-rail__brand',
             text: 'A³',
-            attrs: { href: '#main', 'aria-label': 'Reading Stats home' },
+            attrs: {
+                href: viewHash('dashboard'),
+                'aria-label': 'Reading Stats dashboard',
+            },
         }),
-        ...LINKS.map(([id, label, icon]) =>
-            el(
+        ...DASHBOARD_VIEWS.map((view) => {
+            const { label, icon } = VIEW_LINKS[view];
+            return el(
                 'a',
                 {
+                    className: 'reading-rail__link',
                     attrs: {
-                        href: `#${id}`,
+                        href: viewHash(view),
                         title: label,
                         'aria-label': label,
+                        'data-view': view,
                     },
                 },
                 el('span', { text: icon, attrs: { 'aria-hidden': true } }),
                 el('span', { className: 'reading-rail__label', text: label }),
-            ),
-        ),
+            );
+        }),
         el('a', {
             className: 'reading-rail__archive',
             text: '↗',

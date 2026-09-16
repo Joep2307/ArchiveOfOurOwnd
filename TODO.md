@@ -152,6 +152,32 @@ dashboard.
 - [ ] Manual check on the real site in Chrome and Firefox
 - [x] README: explain the green highlight and the header link
 
+### 8. Back end matches the project standards
+
+- [x] One export per file: move `BootOptions`, `ReadingReview`,
+      `Chapters`, `VisitInfo`, `CountOptions`, `StatsCoreBindings`,
+      `FetchTextResult`, `RetryOptions` and `SyncOptions` into their
+      own files
+- [x] Cross-folder imports go through barrels (`@/model`, `@/stats`),
+      export `ReadingReview` and `reviewCandidates` from them
+- [x] Move the timer Web Worker entry point to `src/exe/`
+- [x] Keep `package.json` within 79 columns (`build:wasm` script)
+- [x] typecheck, lint, tests and build green
+
+### 9. Pages instead of one long scroll
+
+- [x] `view` in the dashboard state, kept in the URL hash (`#/genres`)
+      so reload and the Back button work
+- [x] Menu on the left switches pages and marks the open one
+- [x] Start page is a dashboard: welcome, headline numbers,
+      highlights (top genres, fandoms, most revisited) with links to
+      their pages, and the timeline
+- [x] Genres page: top genre tiles, ranked tag list, ratings,
+      pairing categories, warnings, languages
+- [x] Other pages: Over time, Length & status, Favourites,
+      Standouts, All works
+- [x] Smoke test opens the Genres and All works pages
+
 ## Open questions
 
 - AO3 only stores the _last_ visit date and a visit count per work,

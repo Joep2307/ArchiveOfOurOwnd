@@ -1,7 +1,4 @@
-export type Chapters = {
-    posted: number;
-    total: number | null;
-};
+import type { Chapters } from './Chapters';
 
 /** Parses `3/5`, `1,024/?` and similar chapter counts. */
 export function parseChapters(text: string): Chapters {

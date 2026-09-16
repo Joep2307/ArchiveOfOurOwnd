@@ -4,4 +4,6 @@ export type SyncProgress = {
     lastPage: number | null;
     worksSeen: number;
     message: string;
+    /** Second line in the banner; a default note when missing. */
+    detail?: string;
 };

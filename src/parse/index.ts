@@ -1,6 +1,6 @@
-export type { Chapters } from './parseChapters';
+export type { Chapters } from './Chapters';
 export type { ReadingsPage } from './ReadingsPage';
-export type { VisitInfo } from './parseVisitInfo';
+export type { VisitInfo } from './VisitInfo';
 export { AO3_ORIGIN, MAX_SUMMARY_LENGTH } from './constants';
 export { parseAo3Date } from './parseAo3Date';
 export { parseAuthors } from './parseAuthors';

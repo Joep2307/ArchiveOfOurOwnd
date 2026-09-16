@@ -1,5 +1,8 @@
 /** Pause between history pages, to stay well under AO3 limits. */
-export const PAGE_DELAY_MS = 1500;
+export const PAGE_DELAY_MS = 3000;
+
+/** Upper bound for the pause after AO3 asked us to slow down. */
+export const MAX_PAGE_DELAY_MS = 30_000;
 
 /** Wait used when AO3 says "too many requests" without a hint. */
 export const RATE_LIMIT_WAIT_MS = 60_000;

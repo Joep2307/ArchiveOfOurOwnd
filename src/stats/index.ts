@@ -1,5 +1,5 @@
 export type { CountEntry } from './CountEntry';
-export type { CountOptions } from './countFacet';
+export type { CountOptions } from './CountOptions';
 export type { Facet } from './Facet';
 export type { FacetField } from './FacetField';
 export type { NumberSummary } from './NumberSummary';
@@ -7,7 +7,7 @@ export type { Period } from './Period';
 export type { RankMetric } from './RankMetric';
 export type { Stats } from './Stats';
 export type { StatsCore } from './StatsCore';
-export type { StatsCoreBindings } from './createStatsCore';
+export type { StatsCoreBindings } from './StatsCoreBindings';
 export type { TimelinePoint } from './TimelinePoint';
 export type { Totals } from './Totals';
 export type { WorkFilter } from './WorkFilter';
@@ -15,10 +15,13 @@ export {
     MONTH_LABELS,
     WORD_BUCKET_EDGES,
     WORD_BUCKET_LABELS,
+    MAX_WORDS_PER_MINUTE,
+    MIN_WORDS_PER_MINUTE,
     WORDS_PER_MINUTE,
     WORDS_PER_NOVEL,
 } from './constants';
 export { buildTimeline } from './buildTimeline';
+export { clampWordsPerMinute } from './clampWordsPerMinute';
 export { computeStats } from './computeStats';
 export { countFacet } from './countFacet';
 export { createStatsCore } from './createStatsCore';
@@ -28,6 +31,7 @@ export { filterWorks } from './filterWorks';
 export { loadStatsCore } from './loadStatsCore';
 export { loadStatsCoreSync } from './loadStatsCoreSync';
 export { matchesPeriod } from './matchesPeriod';
+export { reviewCandidates } from './reviewCandidates';
 export { searchText } from './searchText';
 export { topWorks } from './topWorks';
 export { wordBucketOf } from './wordBucketOf';
