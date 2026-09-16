@@ -15,7 +15,10 @@ type Column = {
     key: SortKey | null;
     label: string;
     numeric?: boolean;
-    cell: (work: Work) => Node | string;
+    /** Label for screen readers only. */
+    hiddenLabel?: boolean;
+    className?: string;
+    cell: (work: Work, context: ViewContext) => Node | string;
 };
 
 const RATING_SHORT: Record<string, string> = {
@@ -86,7 +89,33 @@ const COLUMNS: Column[] = [
         label: 'Last visited',
         cell: (work) => formatDate(work.lastVisited),
     },
+    {
+        key: null,
+        label: 'Remove',
+        hiddenLabel: true,
+        className: 'is-action',
+        cell: (work, { state, controller }) =>
+            el('button', {
+                className: 'remove-button',
+                text: '×',
+                attrs: {
+                    type: 'button',
+                    title: 'Remove from your stats',
+                    'aria-label': `Remove ${work.title}`,
+                    disabled: state.sync.running,
+                },
+                on: {
+                    click: () => void controller.removeWork(work),
+                },
+            }),
+    },
 ];
+
+function cellClass(column: Column): string {
+    return [column.numeric ? 'is-numeric' : '', column.className ?? '']
+        .filter(Boolean)
+        .join(' ');
+}
 
 /** Every matching work, sortable and paged. */
 export function renderWorksTable(
@@ -133,11 +162,16 @@ export function renderWorksTable(
                           attrs: { 'aria-hidden': true },
                       }),
                   )
-                : column.label;
+                : column.hiddenLabel
+                  ? el('span', {
+                        className: 'visually-hidden',
+                        text: column.label,
+                    })
+                  : column.label;
             return el(
                 'th',
                 {
-                    className: column.numeric ? 'is-numeric' : '',
+                    className: cellClass(column),
                     attrs: { scope: 'col', 'aria-sort': ariaSort },
                 },
                 content,
@@ -155,8 +189,8 @@ export function renderWorksTable(
                 ...COLUMNS.map((column) =>
                     el(
                         'td',
-                        { className: column.numeric ? 'is-numeric' : '' },
-                        column.cell(work),
+                        { className: cellClass(column) },
+                        column.cell(work, context),
                     ),
                 ),
             ),
@@ -204,7 +238,9 @@ export function renderWorksTable(
         renderPanel(
             {
                 title: plural(works.length, 'entry', 'entries'),
-                subtitle: 'Click a column heading to sort.',
+                subtitle:
+                    'Click a column heading to sort. × removes a work ' +
+                    'from your stats.',
                 className: 'panel--full',
             },
             works.length === 0

@@ -1,7 +1,16 @@
 @use '../abstracts' as *;
 
+// Sections are numbered 01, 02… and set on a two-column grid on wide
+// screens: number + title in the left margin, content on the right.
+main.page {
+    counter-reset: section;
+}
+
 .section {
-    margin-top: var(--space-7);
+    margin-top: var(--space-8);
+    padding-top: var(--space-3);
+    border-top: var(--size-rule) solid var(--color-rule);
+    counter-increment: section;
 
     &:first-of-type {
         margin-top: 0;
@@ -9,12 +18,29 @@
 }
 
 .section__title {
-    margin-bottom: var(--space-3);
-    font-size: var(--text-xl);
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    font-size: var(--text-2xl);
+
+    &::before {
+        content: counter(section, decimal-leading-zero);
+        color: var(--color-accent);
+        font-size: var(--text-md);
+        letter-spacing: 0;
+
+        @include numeric;
+    }
+
+    @include up(md) {
+        font-size: var(--text-3xl);
+    }
 }
 
 .section__lead {
-    margin-bottom: var(--space-4);
+    max-width: 60ch;
+    margin-bottom: var(--space-5);
     color: var(--color-ink-secondary);
 }
 
@@ -31,7 +57,7 @@
 .section__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-7) var(--space-5);
 
     @include up(md) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -45,7 +71,7 @@
 .tiles {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    gap: var(--space-6) var(--space-5);
 
     @include up(md) {
         grid-template-columns: repeat(4, minmax(0, 1fr));

@@ -1,58 +1,58 @@
 @use '../abstracts' as *;
 
+// Padding sits on the outer element so the rule under the inner block
+// lines up with the page content column.
+// The maroon strip along the top nods to AO3's own header.
 .header {
-    background: var(--color-surface);
-    border-bottom: var(--size-hairline) solid var(--color-hairline);
-}
-
-.header__inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3) var(--space-5);
-    max-width: var(--size-page);
-    margin-inline: auto;
-    padding: var(--space-4);
+    padding-inline: var(--space-4);
+    border-top: var(--space-2) solid var(--color-accent);
+    background: var(--color-page);
 
     @include up(md) {
         padding-inline: var(--space-6);
     }
 }
 
+.header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4) var(--space-5);
+    max-width: calc(var(--size-page) - 2 * var(--space-6));
+    margin-inline: auto;
+    padding-block: var(--space-6) var(--space-4);
+    border-bottom: var(--size-rule) solid var(--color-rule);
+}
+
 .header__brand {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--space-3);
 }
 
-// Three stacked "book spines" as the mark.
+// A single red square as the mark.
 .header__mark {
     flex: none;
     width: var(--size-mark);
     height: var(--size-mark);
-    border-radius: var(--radius-md);
-    background:
-        linear-gradient(
-                to top,
-                var(--color-series-1) 0 30%,
-                transparent 30% 36%,
-                var(--color-series-3) 36% 62%,
-                transparent 62% 68%,
-                var(--color-series-2) 68% 90%,
-                transparent 90%
-            )
-            center / 60% 70% no-repeat,
-        var(--color-surface-sunken);
+    margin-top: var(--space-1);
+    background: var(--color-accent);
 }
 
 .header__title {
-    font-size: var(--text-lg);
+    font-size: var(--text-2xl);
+
+    @include up(md) {
+        font-size: var(--text-3xl);
+    }
 }
 
 .header__tagline {
+    @include label;
+
+    margin-top: var(--space-2);
     color: var(--color-ink-muted);
-    font-size: var(--text-sm);
 }
 
 .header__actions {
@@ -74,17 +74,24 @@
 .jump-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1) var(--space-4);
-    margin-bottom: var(--space-5);
-    font-size: var(--text-sm);
+    gap: var(--space-1) var(--space-5);
+    margin-bottom: var(--space-6);
+    counter-reset: jump;
 
     a {
-        color: var(--color-ink-secondary);
+        @include label;
+
+        color: var(--color-ink);
         text-decoration: none;
+        counter-increment: jump;
+
+        &::before {
+            content: counter(jump, decimal-leading-zero) '\00a0\00a0';
+            color: var(--color-ink-muted);
+        }
 
         &:hover {
-            color: var(--color-ink);
-            text-decoration: underline;
+            color: var(--color-accent);
         }
     }
 }

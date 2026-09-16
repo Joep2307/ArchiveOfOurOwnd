@@ -1,4 +1,4 @@
-import type { DashboardController, DashboardState } from '@/app';
+import type { DashboardController, DashboardState, SortKey } from '@/app';
 import { formatNumber } from '@/format';
 import type { Period } from '@/stats';
 import { el } from './el';
@@ -6,6 +6,22 @@ import { facetLabel } from './facetLabel';
 import type { FilterBar } from './FilterBar';
 
 const SEARCH_DELAY_MS = 200;
+
+/** Shown when the table is sorted in a way the picker doesn't list. */
+const CUSTOM_SORT = 'custom';
+
+const SORT_OPTIONS: [SortKey, boolean, string][] = [
+    ['lastVisited', true, 'Recently visited'],
+    ['words', true, 'Longest first'],
+    ['words', false, 'Shortest first'],
+    ['kudos', true, 'Most kudos'],
+    ['visits', true, 'Most visits'],
+    ['title', false, 'Title A–Z'],
+];
+
+function sortValue(key: SortKey, descending: boolean): string {
+    return `${key}:${descending ? 'desc' : 'asc'}`;
+}
 
 function periodOptions(state: DashboardState): [Period, string][] {
     const years = new Set<string>();
@@ -25,7 +41,7 @@ function periodOptions(state: DashboardState): [Period, string][] {
     ];
 }
 
-/** Search box, period picker and active filter chips. */
+/** Search box, period and sort pickers and active filter chips. */
 export function createFilterBar(controller: DashboardController): FilterBar {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let optionsKey = '';
@@ -55,6 +71,37 @@ export function createFilterBar(controller: DashboardController): FilterBar {
             },
         },
     });
+    const sort = el(
+        'select',
+        {
+            className: 'input',
+            attrs: { 'aria-label': 'Sort works' },
+            on: {
+                change: () => {
+                    const option = SORT_OPTIONS.find(
+                        ([key, descending]) =>
+                            sortValue(key, descending) === sort.value,
+                    );
+                    if (option) {
+                        controller.setSort(option[0], option[1]);
+                        document
+                            .getElementById('works')
+                            ?.scrollIntoView({ block: 'start' });
+                    }
+                },
+            },
+        },
+        ...SORT_OPTIONS.map(([key, descending, label]) =>
+            el('option', {
+                text: label,
+                attrs: { value: sortValue(key, descending) },
+            }),
+        ),
+        el('option', {
+            text: 'Custom order',
+            attrs: { value: CUSTOM_SORT, hidden: true, disabled: true },
+        }),
+    );
     const chips = el('ul', {
         className: 'chips',
         attrs: { 'aria-label': 'Active filters' },
@@ -72,6 +119,7 @@ export function createFilterBar(controller: DashboardController): FilterBar {
             { className: 'filter-bar__inner' },
             search,
             period,
+            sort,
             chips,
             count,
         ),
@@ -95,6 +143,16 @@ export function createFilterBar(controller: DashboardController): FilterBar {
                 );
             }
             period.value = filter.period;
+
+            const current = sortValue(
+                state.table.sort,
+                state.table.descending,
+            );
+            sort.value = SORT_OPTIONS.some(
+                ([key, descending]) => sortValue(key, descending) === current,
+            )
+                ? current
+                : CUSTOM_SORT;
 
             const active =
                 filter.facets.length > 0 ||

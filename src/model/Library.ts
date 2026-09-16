@@ -8,4 +8,9 @@ export type Library = {
     syncedAt: string | null;
     /** Works in history order (most recently visited first). */
     works: Work[];
+    /**
+     * Keys of works the reader removed. They stay hidden, even when a
+     * sync finds them again.
+     */
+    removed?: string[];
 };

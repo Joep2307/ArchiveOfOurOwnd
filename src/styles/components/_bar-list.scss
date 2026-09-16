@@ -28,7 +28,11 @@
 
     &.is-active {
         background: var(--color-info-soft);
-        box-shadow: inset var(--size-gap) 0 0 var(--color-accent);
+        box-shadow: inset var(--size-rule) 0 0 var(--color-accent);
+
+        .bar-list__bar {
+            background: var(--color-accent);
+        }
     }
 
     .bar-list--ranked & {

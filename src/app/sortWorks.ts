@@ -16,7 +16,13 @@ const NUMBER: Partial<Record<SortKey, (work: Work) => number>> = {
     kudos: (w) => w.kudos,
 };
 
-/** Returns a sorted copy. Ties keep history order. */
+/** Deleted and hidden works have no length or kudos to compare. */
+const WORKS_ONLY = new Set<SortKey>(['words', 'kudos']);
+
+/**
+ * Returns a sorted copy. Ties keep history order. For length and
+ * kudos, entries without those numbers go last in both directions.
+ */
 export function sortWorks(
     works: readonly Work[],
     key: SortKey,
@@ -28,6 +34,14 @@ export function sortWorks(
     return works
         .map((work, index) => ({ work, index }))
         .sort((a, b) => {
+            if (WORKS_ONLY.has(key)) {
+                const missing =
+                    Number(a.work.kind !== 'work') -
+                    Number(b.work.kind !== 'work');
+                if (missing !== 0) {
+                    return missing;
+                }
+            }
             let result = 0;
             if (text) {
                 result = text(a.work).localeCompare(text(b.work));

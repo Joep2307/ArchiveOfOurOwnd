@@ -1,55 +1,43 @@
 @use '../abstracts' as *;
 
 .welcome {
-    max-width: calc(var(--size-page) * 0.6);
-    margin: var(--space-7) auto;
-    padding: var(--space-6);
-    border: var(--size-hairline) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
-
-    @include up(md) {
-        padding: var(--space-7);
-    }
+    max-width: calc(var(--size-page) * 0.7);
+    margin-block: var(--space-7);
 }
 
 .welcome__title {
-    font-size: var(--text-2xl);
+    font-size: var(--text-3xl);
 
     @include up(md) {
-        font-size: var(--text-3xl);
+        font-size: var(--text-4xl);
     }
 }
 
 .welcome__lead {
-    margin-top: var(--space-3);
+    max-width: 48ch;
+    margin-top: var(--space-5);
     color: var(--color-ink-secondary);
     font-size: var(--text-lg);
 }
 
 .welcome__steps {
     display: grid;
-    gap: var(--space-3);
-    margin-top: var(--space-5);
+    margin-top: var(--space-6);
     counter-reset: step;
 
     li {
-        position: relative;
-        padding-left: var(--space-6);
+        display: grid;
+        grid-template-columns: var(--space-7) minmax(0, 1fr);
+        padding-block: var(--space-3);
+        border-top: var(--size-hairline) solid var(--color-hairline);
         counter-increment: step;
 
         &::before {
-            content: counter(step);
-            position: absolute;
-            left: 0;
-            display: grid;
-            place-items: center;
-            width: var(--space-5);
-            height: var(--space-5);
-            border-radius: var(--radius-pill);
-            background: var(--color-accent-soft);
-            font-size: var(--text-xs);
+            content: counter(step, decimal-leading-zero);
+            color: var(--color-accent);
             font-weight: var(--weight-bold);
+
+            @include numeric;
         }
     }
 }

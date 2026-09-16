@@ -38,6 +38,7 @@ export function renderHeader(
 ): HTMLElement {
     const { library, sync, demo, standalone } = state;
     const hasData = Boolean(library);
+    const removedCount = library?.removed?.length ?? 0;
 
     const fileInput = el('input', {
         className: 'visually-hidden',
@@ -131,6 +132,11 @@ export function renderHeader(
                 }`,
                 () => void controller.setHighlightOnAo3(!state.highlightOnAo3),
                 { disabled: standalone },
+            ),
+            menuItem(
+                `Restore removed works (${removedCount})`,
+                () => void controller.restoreRemoved(),
+                { disabled: demo || removedCount === 0 || sync.running },
             ),
             menuItem(
                 'Delete stored history…',

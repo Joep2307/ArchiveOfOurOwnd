@@ -1,4 +1,4 @@
-import type { Library, Work } from '@/model';
+import { hideRemoved, type Library, type Work } from '@/model';
 import type { ReadIndex } from './ReadIndex';
 
 export function buildReadIndex(
@@ -9,7 +9,8 @@ export function buildReadIndex(
     for (const id of openedIds) {
         index.set(id, null);
     }
-    for (const work of library?.works ?? []) {
+    const works = library ? hideRemoved(library).works : [];
+    for (const work of works) {
         if (work.id !== null) {
             index.set(work.id, work);
         }

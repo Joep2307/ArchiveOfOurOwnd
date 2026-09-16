@@ -1,15 +1,10 @@
 @use '../abstracts' as *;
 
 .panel {
-    min-width: 0;
-    padding: var(--space-4);
-    border: var(--size-hairline) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    @include rule-top;
 
-    @include up(md) {
-        padding: var(--space-5);
-    }
+    min-width: 0;
+    padding-top: var(--space-3);
 }
 
 .panel--wide {
@@ -28,11 +23,12 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-2) var(--space-4);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
 }
 
 .panel__title {
-    font-size: var(--text-md);
+    font-size: var(--text-lg);
+    letter-spacing: -0.01em;
 }
 
 .panel__subtitle {

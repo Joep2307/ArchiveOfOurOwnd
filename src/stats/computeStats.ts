@@ -132,6 +132,7 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
         series,
         mostVisited: topWorks(readable, (w) => w.visits, TOP_WORKS),
         longest: topWorks(readable, (w) => w.words, TOP_WORKS),
+        shortest: topWorks(readable, (w) => -w.words, TOP_WORKS),
         mostKudos: topWorks(readable, (w) => w.kudos, TOP_WORKS),
         hiddenGems: topWorks(
             readable.filter((w) => w.visits > 1),

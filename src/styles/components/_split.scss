@@ -63,6 +63,7 @@
 
     &.is-active {
         background: var(--color-info-soft);
+        box-shadow: inset var(--size-rule) 0 0 var(--color-accent);
     }
 
     strong,

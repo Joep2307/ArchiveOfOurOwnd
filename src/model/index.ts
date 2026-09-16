@@ -7,3 +7,4 @@ export type { Work } from './Work';
 export type { WorkKind } from './WorkKind';
 export { CATEGORIES, LIBRARY_VERSION, RATINGS } from './constants';
 export { createEmptyLibrary } from './createEmptyLibrary';
+export { hideRemoved } from './hideRemoved';

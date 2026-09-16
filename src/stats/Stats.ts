@@ -28,6 +28,7 @@ export type Stats = {
     series: CountEntry[];
     mostVisited: Work[];
     longest: Work[];
+    shortest: Work[];
     mostKudos: Work[];
     hiddenGems: Work[];
     busiestMonth: TimelinePoint | null;

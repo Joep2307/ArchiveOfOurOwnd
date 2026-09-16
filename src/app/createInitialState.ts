@@ -11,6 +11,7 @@ export function createInitialState(standalone: boolean): DashboardState {
         table: { sort: 'lastVisited', descending: true, page: 0 },
         expanded: {},
         rankBy: 'works',
+        lengthOrder: 'longest',
         theme: 'system',
         highlightOnAo3: true,
     };

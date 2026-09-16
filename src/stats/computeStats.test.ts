@@ -43,6 +43,7 @@ describe('computeStats', () => {
         const counts = stats.fandoms.map((f) => f.works);
         expect(counts).toEqual([...counts].sort((a, b) => b - a));
         expect(stats.longest[0]?.words).toBe(stats.wordSummary.max);
+        expect(stats.shortest[0]?.words).toBe(stats.wordSummary.min);
     });
 });
 

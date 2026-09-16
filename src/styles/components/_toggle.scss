@@ -2,23 +2,27 @@
 
 .toggle {
     display: inline-flex;
-    padding: var(--size-gap);
-    border-radius: var(--radius-md);
-    background: var(--color-surface-sunken);
+    border: var(--size-hairline) solid var(--color-ink);
 }
 
 .toggle__option {
     @include reset-button;
 
     padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-sm);
-    color: var(--color-ink-secondary);
+    color: var(--color-ink);
     font-size: var(--text-sm);
 
+    & + & {
+        border-left: var(--size-hairline) solid var(--color-ink);
+    }
+
+    &:hover:not(.is-active) {
+        background: var(--color-surface-sunken);
+    }
+
     &.is-active {
-        background: var(--color-surface-raised);
-        color: var(--color-ink);
-        box-shadow: 0 var(--size-hairline) var(--space-1) var(--color-shadow);
+        background: var(--color-ink);
+        color: var(--color-page);
         font-weight: var(--weight-medium);
     }
 }

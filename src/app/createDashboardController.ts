@@ -1,5 +1,6 @@
 import { parseLibraryFile, worksToCsv } from '@/export';
-import type { Library } from '@/model';
+import { plural } from '@/format';
+import { hideRemoved, type Library } from '@/model';
 import { filterWorks, type Facet } from '@/stats';
 import {
     clearLibrary,
@@ -49,6 +50,19 @@ export function createDashboardController(
         }));
     };
 
+    const shown = (library: Library | null): Library | null =>
+        library && hideRemoved(library);
+
+    /** Saves a new removed list and shows the result. */
+    const saveRemoved = async (removed: string[]): Promise<void> => {
+        if (!stored) {
+            return;
+        }
+        stored = { ...stored, removed };
+        await saveLibrary(deps.storage, stored);
+        store.update({ library: shown(stored) });
+    };
+
     const visibleWorks = (): Library['works'] => {
         const { library, filter } = store.get();
         return library ? filterWorks(library.works, filter, deps.now()) : [];
@@ -61,7 +75,11 @@ export function createDashboardController(
                 loadHighlightSetting(deps.storage),
             ]);
             stored = library;
-            store.update({ library, demo: false, highlightOnAo3 });
+            store.update({
+                library: shown(library),
+                demo: false,
+                highlightOnAo3,
+            });
         },
 
         async sync(full) {
@@ -81,7 +99,7 @@ export function createDashboardController(
                 return;
             }
             abort = new AbortController();
-            store.update({ demo: false, library: stored });
+            store.update({ demo: false, library: shown(stored) });
             setSync({
                 running: true,
                 error: null,
@@ -105,7 +123,7 @@ export function createDashboardController(
                     save: async (partial) => {
                         await saveLibrary(deps.storage, partial);
                         stored = partial;
-                        store.update({ library: partial });
+                        store.update({ library: shown(partial) });
                     },
                     onProgress: (progress) => {
                         setSync({ progress });
@@ -152,11 +170,16 @@ export function createDashboardController(
         },
 
         hideDemo() {
-            store.update({ demo: false, library: stored, ...resetView() });
+            store.update({
+                demo: false,
+                library: shown(stored),
+                ...resetView(),
+            });
         },
 
         exportJson() {
-            const { library } = store.get();
+            // The stored copy still holds the removed works.
+            const library = store.get().demo ? store.get().library : stored;
             if (!library) {
                 return;
             }
@@ -186,7 +209,11 @@ export function createDashboardController(
                 const library = parseLibraryFile(text);
                 await saveLibrary(deps.storage, library);
                 stored = library;
-                store.update({ library, demo: false, ...resetView() });
+                store.update({
+                    library: shown(library),
+                    demo: false,
+                    ...resetView(),
+                });
                 setSync({
                     error: null,
                     notice: `Imported ${library.works.length} entries.`,
@@ -264,6 +291,10 @@ export function createDashboardController(
             }));
         },
 
+        setSort(sort, descending) {
+            store.update({ table: { sort, descending, page: 0 } });
+        },
+
         setPage(page) {
             store.update((state) => ({
                 table: { ...state.table, page },
@@ -278,6 +309,51 @@ export function createDashboardController(
 
         setRankBy(rankBy) {
             store.update({ rankBy });
+        },
+
+        setLengthOrder(lengthOrder) {
+            store.update({ lengthOrder });
+        },
+
+        async removeWork(work) {
+            const { library, demo, sync } = store.get();
+            if (!library || sync.running) {
+                return;
+            }
+            const notice = `Removed “${work.title}”.`;
+            if (demo) {
+                store.update({
+                    library: {
+                        ...library,
+                        works: library.works.filter((w) => w.key !== work.key),
+                    },
+                });
+            } else {
+                const removed = stored?.removed ?? [];
+                if (removed.includes(work.key)) {
+                    return;
+                }
+                await saveRemoved([...removed, work.key]);
+            }
+            setSync({
+                error: null,
+                notice: demo
+                    ? notice
+                    : `${notice} Options → Restore removed works ` +
+                      'brings it back.',
+            });
+        },
+
+        async restoreRemoved() {
+            const count = stored?.removed?.length ?? 0;
+            if (count === 0 || store.get().sync.running) {
+                return;
+            }
+            await saveRemoved([]);
+            setSync({
+                error: null,
+                notice: `Restored ${plural(count, 'removed work')}.`,
+            });
         },
 
         setTheme(theme) {

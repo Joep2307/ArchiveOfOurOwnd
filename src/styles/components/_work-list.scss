@@ -15,8 +15,8 @@
     counter-increment: work;
 
     &::before {
-        content: counter(work);
-        color: var(--color-ink-muted);
+        content: counter(work, decimal-leading-zero);
+        color: var(--color-accent);
         font-size: var(--text-xs);
         line-height: 2;
 

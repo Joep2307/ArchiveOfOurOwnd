@@ -12,18 +12,20 @@
 }
 
 main.page {
-    padding-block: var(--space-5) var(--space-8);
+    padding-block: var(--space-4) var(--space-8);
 }
 
 .loading {
+    @include label;
+
     padding: var(--space-8) 0;
     color: var(--color-ink-muted);
-    text-align: center;
 }
 
 .footer {
-    margin-top: var(--space-7);
+    margin-top: var(--space-8);
+    padding-top: var(--space-3);
+    border-top: var(--size-rule) solid var(--color-rule);
     color: var(--color-ink-muted);
-    font-size: var(--text-sm);
-    text-align: center;
+    font-size: var(--text-xs);
 }

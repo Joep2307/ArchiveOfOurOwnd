@@ -1,5 +1,6 @@
 import type { Library } from '@/model';
 import type { RankMetric, WorkFilter } from '@/stats';
+import type { LengthOrder } from './LengthOrder';
 import type { SortKey } from './SortKey';
 import type { SyncView } from './SyncView';
 
@@ -20,6 +21,8 @@ export type DashboardState = {
     /** Lists expanded with "Show all", by list id. */
     expanded: Record<string, boolean>;
     rankBy: RankMetric;
+    /** Which end of the length ranking the standouts show. */
+    lengthOrder: LengthOrder;
     theme: 'system' | 'light' | 'dark';
     /** Highlight read works on archiveofourown.org. */
     highlightOnAo3: boolean;

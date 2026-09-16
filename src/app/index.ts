@@ -1,6 +1,7 @@
 export type { DashboardController } from './DashboardController';
 export type { DashboardDeps } from './DashboardDeps';
 export type { DashboardState } from './DashboardState';
+export type { LengthOrder } from './LengthOrder';
 export type { SortKey } from './SortKey';
 export type { Store } from './Store';
 export type { SyncView } from './SyncView';

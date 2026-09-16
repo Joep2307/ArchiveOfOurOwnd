@@ -5,8 +5,7 @@
     top: 0;
     z-index: 20;
     border-bottom: var(--size-hairline) solid var(--color-hairline);
-    background: color-mix(in srgb, var(--color-page) 92%, transparent);
-    backdrop-filter: blur(8px);
+    background: var(--color-page);
 }
 
 .filter-bar__inner {
@@ -24,9 +23,10 @@
 }
 
 .filter-bar__count {
+    @include label;
+
     margin-left: auto;
     color: var(--color-ink-muted);
-    font-size: var(--text-sm);
     white-space: nowrap;
 
     @include numeric;

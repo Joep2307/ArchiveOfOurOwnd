@@ -73,7 +73,7 @@
     background: var(--color-series-1);
 
     .columns__col.is-active & {
-        background: var(--color-accent-strong);
+        background: var(--color-accent);
     }
 
     &[data-empty] {

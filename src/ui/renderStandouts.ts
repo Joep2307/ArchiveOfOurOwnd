@@ -1,12 +1,15 @@
+import type { LengthOrder } from '@/app';
 import { formatNumber, plural } from '@/format';
 import { renderPanel } from './renderPanel';
 import { renderSection } from './renderSection';
+import { renderToggle } from './renderToggle';
 import { renderWorkList } from './renderWorkList';
 import type { ViewContext } from './ViewContext';
 
-/** Most revisited, longest, most loved and hidden gems. */
+/** Most revisited, longest or shortest, most loved and hidden gems. */
 export function renderStandouts(context: ViewContext): HTMLElement {
-    const { stats } = context;
+    const { state, stats, controller } = context;
+    const shortest = state.lengthOrder === 'shortest';
     return renderSection(
         'standouts',
         'Standouts',
@@ -19,9 +22,23 @@ export function renderStandouts(context: ViewContext): HTMLElement {
             ),
         ),
         renderPanel(
-            { title: 'Longest', subtitle: 'The epics you took on.' },
+            {
+                title: shortest ? 'Shortest' : 'Longest',
+                subtitle: shortest ? 'Quick reads.' : 'The epics you took on.',
+                actions: renderToggle(
+                    'Length',
+                    [
+                        { id: 'longest', label: 'Longest' },
+                        { id: 'shortest', label: 'Shortest' },
+                    ],
+                    state.lengthOrder,
+                    (id) => {
+                        controller.setLengthOrder(id as LengthOrder);
+                    },
+                ),
+            },
             renderWorkList(
-                stats.longest,
+                shortest ? stats.shortest : stats.longest,
                 (work) => `${formatNumber(work.words)} words`,
                 'Nothing yet.',
             ),

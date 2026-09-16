@@ -20,19 +20,19 @@
     max-width: 100%;
     min-height: calc(var(--size-touch) - var(--space-2));
     padding: 0 var(--space-3);
-    border-radius: var(--radius-pill);
-    background: var(--color-info-soft);
-    color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-page);
     font-size: var(--text-sm);
     overflow-wrap: anywhere;
 
     &:hover {
-        background: var(--color-accent-soft);
+        background: var(--color-accent);
+        color: var(--color-accent-ink);
     }
 }
 
 .chip__x {
-    color: var(--color-ink-secondary);
+    color: inherit;
     font-size: var(--text-lg);
     line-height: 1;
 }
