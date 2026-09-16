@@ -1,4 +1,4 @@
-// Worker side of createWorkerSleep: echoes each id after its delay.
+// Timer Web Worker entry point: echoes each id after its delay.
 
 type TimerRequest = { id: number; ms: number };
 

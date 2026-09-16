@@ -55,7 +55,11 @@ function sortByValue(entries: CountEntry[]): CountEntry[] {
 }
 
 /** Computes every statistic for a list of works. */
-export function computeStats(works: readonly Work[], core: StatsCore): Stats {
+export function computeStats(
+    works: readonly Work[],
+    core: StatsCore,
+    wordsPerMinute: number = WORDS_PER_MINUTE,
+): Stats {
     const readable = works.filter((work) => work.kind === 'work');
     const timeline = buildTimeline(works);
     const [firstVisited, lastVisited] = dateRange(works);
@@ -101,7 +105,7 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
                 (sum, work) => sum + work.chaptersPosted,
                 0,
             ),
-            readingMinutes: Math.round(words / WORDS_PER_MINUTE),
+            readingMinutes: Math.round(words / wordsPerMinute),
             novels: words / WORDS_PER_NOVEL,
             firstVisited,
             lastVisited,

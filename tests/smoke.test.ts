@@ -32,8 +32,23 @@ describe('smoke', () => {
             deps: { storage },
         });
         await new Promise((resolve) => setTimeout(resolve, 50));
+        expect(app.querySelector('#highlights')).not.toBeNull();
         expect(app.querySelector('.tile__value')).not.toBeNull();
+
+        const open = async (hash: string): Promise<void> => {
+            window.location.hash = hash;
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        };
+        await open('#/genres');
+        expect(app.querySelector('#genres')).not.toBeNull();
+        expect(app.querySelector('#highlights')).toBeNull();
+        expect(app.querySelector('[data-view="genres"]')?.ariaCurrent).toBe(
+            'page',
+        );
+        await open('#/works');
         expect(app.querySelector('.works-table')).not.toBeNull();
+        window.location.hash = '';
     });
 
     it('compiles the styles', () => {

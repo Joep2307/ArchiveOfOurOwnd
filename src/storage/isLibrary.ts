@@ -1,4 +1,5 @@
 import type { Library } from '@/model';
+import { isWorkFeedback } from './isWorkFeedback';
 
 /** Loose shape check for data read from storage or a file. */
 export function isLibrary(value: unknown): value is Library {
@@ -10,6 +11,11 @@ export function isLibrary(value: unknown): value is Library {
         candidate.version === 1 &&
         typeof candidate.username === 'string' &&
         Array.isArray(candidate.works) &&
+        (candidate.feedback === undefined ||
+            (typeof candidate.feedback === 'object' &&
+                candidate.feedback !== null &&
+                !Array.isArray(candidate.feedback) &&
+                Object.values(candidate.feedback).every(isWorkFeedback))) &&
         (candidate.reviews === undefined ||
             (typeof candidate.reviews === 'object' &&
                 candidate.reviews !== null &&

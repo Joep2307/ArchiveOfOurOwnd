@@ -1,15 +1,8 @@
 import type { Work } from '@/model';
 import type { CountEntry } from './CountEntry';
+import type { CountOptions } from './CountOptions';
 import type { FacetField } from './FacetField';
 import { facetValues } from './facetValues';
-
-export type CountOptions = {
-    /** Fixed order of values; others are appended by count. */
-    order?: readonly string[];
-    /** Keep values in `order` even when their count is 0. */
-    keepEmpty?: boolean;
-    label?: (value: string) => string;
-};
 
 /**
  * Counts works per value of a facet, sorted by works (then words),

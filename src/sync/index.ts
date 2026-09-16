@@ -1,8 +1,9 @@
-export type { FetchText, FetchTextResult } from './FetchText';
-export type { RetryOptions } from './fetchWithRetry';
+export type { FetchText } from './FetchText';
+export type { FetchTextResult } from './FetchTextResult';
+export type { RetryOptions } from './RetryOptions';
 export type { Sleep } from './Sleep';
 export type { SyncErrorCode } from './SyncErrorCode';
-export type { SyncOptions } from './runSync';
+export type { SyncOptions } from './SyncOptions';
 export type { SyncProgress } from './SyncProgress';
 export {
     CHECKPOINT_EVERY,

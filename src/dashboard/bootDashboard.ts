@@ -3,27 +3,22 @@ import {
     createInitialState,
     createStore,
     type DashboardDeps,
+    viewFromHash,
 } from '@/app';
 import { getBrowserApi } from '@/browser';
 import { createDemoLibrary } from '@/demo';
 import { downloadFile } from '@/export';
 import { parseHtml } from '@/parse';
-import { loadStatsCore, type StatsCore } from '@/stats';
+import { loadStatsCore } from '@/stats';
 import { createMemoryStorage, getExtensionStorage } from '@/storage';
 import { browserFetchText, createWorkerSleep } from '@/sync';
 import { mountDashboard } from '@/ui';
+import type { BootOptions } from './BootOptions';
 import { DEMO_QUERY_PARAM } from './constants';
 import { createTimerWorker } from './createTimerWorker';
 import { readThemePreference } from './readThemePreference';
 import { requestAo3Access } from './requestAo3Access';
 import { writeThemePreference } from './writeThemePreference';
-
-export type BootOptions = {
-    /** Override the wasm loader (tests). */
-    core?: StatsCore;
-    /** Override the storage (tests, preview). */
-    deps?: Partial<DashboardDeps>;
-};
 
 /** Starts the dashboard page inside `root`. */
 export async function bootDashboard(
@@ -51,6 +46,7 @@ export async function bootDashboard(
     const store = createStore({
         ...createInitialState(standalone),
         theme: readThemePreference(),
+        view: viewFromHash(window.location.hash) ?? 'dashboard',
     });
     const controller = createDashboardController(store, deps);
     store.subscribe((state, previous) => {

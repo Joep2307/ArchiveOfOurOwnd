@@ -1,22 +1,33 @@
-import type { DashboardController, DashboardState } from '@/app';
+import type {
+    DashboardController,
+    DashboardState,
+    DashboardView,
+} from '@/app';
 import type { Work } from '@/model';
 import type { Stats, StatsCore } from '@/stats';
 import { computeStats, filterWorks } from '@/stats';
 import { el } from './el';
 import type { FilterBar } from './FilterBar';
+import { markActiveView } from './markActiveView';
 import { renderDistributions } from './renderDistributions';
+import { renderGenres } from './renderGenres';
+import { renderFeedback } from './renderFeedback';
 import { renderHeader } from './renderHeader';
+import { renderHighlights } from './renderHighlights';
 import { renderReadingHero } from './renderReadingHero';
-import { renderReadingReview } from './renderReadingReview';
 import { renderOverview } from './renderOverview';
+import { renderReadingReview } from './renderReadingReview';
+import { renderSettings } from './renderSettings';
 import { renderStandouts } from './renderStandouts';
 import { renderSyncBanner } from './renderSyncBanner';
 import { renderTimeline } from './renderTimeline';
 import { renderTopLists } from './renderTopLists';
 import { renderWelcome } from './renderWelcome';
 import { renderWorksTable } from './renderWorksTable';
+import type { ViewContext } from './ViewContext';
 
 export type DashboardParts = {
+    nav: HTMLElement;
     review: HTMLDialogElement;
     header: HTMLElement;
     banner: HTMLElement;
@@ -27,9 +38,51 @@ export type DashboardParts = {
 type Cache = {
     works: readonly Work[] | null;
     filter: DashboardState['filter'] | null;
+    wordsPerMinute: number;
     matching: Work[];
     stats: Stats | null;
 };
+
+function renderView(
+    view: DashboardView,
+    context: ViewContext,
+    matching: Work[],
+): HTMLElement[] {
+    switch (view) {
+        case 'dashboard':
+            return [
+                renderReadingHero(context.state),
+                renderOverview(context.stats, context.state.wordsPerMinute),
+                renderFeedback(context.state, context.controller, matching),
+                renderHighlights(context),
+                renderTimeline(context),
+            ];
+        case 'genres':
+            return [renderGenres(context)];
+        case 'time':
+            return [renderTimeline(context)];
+        case 'shape':
+            return [renderDistributions(context)];
+        case 'favourites':
+            return [renderTopLists(context)];
+        case 'standouts':
+            return [renderStandouts(context)];
+        case 'works':
+            return [renderWorksTable(context, matching)];
+        case 'settings':
+            return [renderSettings(context.state, context.controller)];
+    }
+}
+
+function footer(): HTMLElement {
+    return el('footer', {
+        className: 'footer',
+        text:
+            'Unofficial fan-made tool, not affiliated with the ' +
+            'Organization for Transformative Works. Your ' +
+            'history stays in this browser.',
+    });
+}
 
 /** Renders the whole page for one state. */
 export function createDashboardRenderer(
@@ -41,6 +94,7 @@ export function createDashboardRenderer(
     const cache: Cache = {
         works: null,
         filter: null,
+        wordsPerMinute: 0,
         matching: [],
         stats: null,
     };
@@ -50,12 +104,18 @@ export function createDashboardRenderer(
         if (
             cache.stats === null ||
             cache.works !== works ||
-            cache.filter !== state.filter
+            cache.filter !== state.filter ||
+            cache.wordsPerMinute !== state.wordsPerMinute
         ) {
             cache.works = works;
             cache.filter = state.filter;
+            cache.wordsPerMinute = state.wordsPerMinute;
             cache.matching = filterWorks(works, state.filter, now());
-            cache.stats = computeStats(cache.matching, core);
+            cache.stats = computeStats(
+                cache.matching,
+                core,
+                state.wordsPerMinute,
+            );
         }
         return [cache.matching, cache.stats];
     };
@@ -75,6 +135,7 @@ export function createDashboardRenderer(
             theme.setAttribute('data-theme', state.theme);
         }
 
+        markActiveView(parts.nav, state.view);
         parts.header.replaceChildren(renderHeader(state, controller, now()));
         const banner = renderSyncBanner(state, controller);
         parts.banner.replaceChildren(...(banner ? [banner] : []));
@@ -85,6 +146,14 @@ export function createDashboardRenderer(
             parts.filterBar.element.hidden = true;
             parts.main.replaceChildren(
                 el('p', { className: 'loading', text: 'Loading…' }),
+            );
+            return;
+        }
+        if (state.view === 'settings') {
+            parts.filterBar.element.hidden = true;
+            parts.main.replaceChildren(
+                renderSettings(state, controller),
+                footer(),
             );
             return;
         }
@@ -144,20 +213,8 @@ export function createDashboardRenderer(
             parts.review.scrollTop = scrollTop;
         }
         parts.main.replaceChildren(
-            renderReadingHero(state),
-            renderOverview(stats),
-            renderTimeline(context),
-            renderDistributions(context),
-            renderTopLists(context),
-            renderStandouts(context),
-            renderWorksTable(context, matching),
-            el('footer', {
-                className: 'footer',
-                text:
-                    'Unofficial fan-made tool, not affiliated with the ' +
-                    'Organization for Transformative Works. Your ' +
-                    'history stays in this browser.',
-            }),
+            ...renderView(state.view, context, matching),
+            footer(),
         );
     };
 }

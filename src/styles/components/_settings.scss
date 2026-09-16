@@ -1,0 +1,48 @@
+@use '../abstracts' as *;
+
+.settings__panels {
+    display: grid;
+    gap: var(--space-5);
+    max-width: calc(var(--size-page) * 0.55);
+}
+
+.settings__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.settings__label {
+    font-weight: var(--weight-medium);
+}
+
+.settings__number {
+    width: calc(var(--space-8) * 1.75);
+}
+
+.settings__hint {
+    max-width: 60ch;
+    margin-top: var(--space-3);
+}
+
+.settings__passage {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 62ch;
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+    line-height: var(--line-normal);
+}
+
+.settings__result {
+    margin-top: var(--space-4);
+    font-size: var(--text-xl);
+
+    strong {
+        color: var(--color-accent);
+
+        @include numeric;
+    }
+}

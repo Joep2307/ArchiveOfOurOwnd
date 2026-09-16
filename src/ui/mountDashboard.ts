@@ -1,4 +1,9 @@
-import type { DashboardController, DashboardState, Store } from '@/app';
+import {
+    viewFromHash,
+    type DashboardController,
+    type DashboardState,
+    type Store,
+} from '@/app';
 import type { StatsCore } from '@/stats';
 import { createFilterBar } from './createFilterBar';
 import { el } from './el';
@@ -14,6 +19,7 @@ export function mountDashboard(
     now: () => Date,
 ): () => void {
     const parts = {
+        nav: renderNav(),
         review: el('dialog', {
             className: 'review-dialog',
             attrs: { 'aria-labelledby': 'reading-review-h' },
@@ -27,7 +33,10 @@ export function mountDashboard(
         header: el('div', { className: 'header-slot' }),
         banner: el('div', { className: 'banner-slot page' }),
         filterBar: createFilterBar(controller),
-        main: el('main', { className: 'page', attrs: { id: 'main' } }),
+        main: el('main', {
+            className: 'page',
+            attrs: { id: 'main', tabindex: -1 },
+        }),
     };
     root.replaceChildren(
         el('a', {
@@ -35,7 +44,7 @@ export function mountDashboard(
             text: 'Skip to content',
             attrs: { href: '#main' },
         }),
-        renderNav(),
+        parts.nav,
         parts.header,
         parts.banner,
         parts.filterBar.element,
@@ -51,6 +60,20 @@ export function mountDashboard(
             render(store.get());
         });
     };
+    const onHashChange = (): void => {
+        const view = viewFromHash(window.location.hash);
+        if (view !== null && view !== store.get().view) {
+            controller.showView(view);
+            window.scrollTo({ top: 0 });
+            parts.main.focus({ preventScroll: true });
+        }
+    };
+    window.addEventListener('hashchange', onHashChange);
+
     render(store.get());
-    return store.subscribe(schedule);
+    const unsubscribe = store.subscribe(schedule);
+    return () => {
+        unsubscribe();
+        window.removeEventListener('hashchange', onHashChange);
+    };
 }

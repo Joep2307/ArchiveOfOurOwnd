@@ -1,16 +1,20 @@
 import { parseLibraryFile, worksToCsv } from '@/export';
+import { feedbackCandidates, runFeedbackScan } from '@/feedback';
 import { plural } from '@/format';
 import { hideRemoved, type Library } from '@/model';
-import { filterWorks, type Facet } from '@/stats';
+import { clampWordsPerMinute, filterWorks, type Facet } from '@/stats';
 import {
     clearLibrary,
     loadActiveLibrary,
     loadHighlightSetting,
     loadLibrary,
+    loadWordsPerMinute,
     saveHighlightSetting,
     saveLibrary,
+    saveWordsPerMinute,
 } from '@/storage';
 import { runSync, SyncError } from '@/sync';
+import { MIN_SPEED_TEST_MS } from './constants';
 import type { DashboardController } from './DashboardController';
 import type { DashboardDeps } from './DashboardDeps';
 import type { DashboardState } from './DashboardState';
@@ -149,15 +153,18 @@ export function createDashboardController(
         },
 
         async load() {
-            const [library, highlightOnAo3] = await Promise.all([
-                loadActiveLibrary(deps.storage),
-                loadHighlightSetting(deps.storage),
-            ]);
+            const [library, highlightOnAo3, wordsPerMinute] =
+                await Promise.all([
+                    loadActiveLibrary(deps.storage),
+                    loadHighlightSetting(deps.storage),
+                    loadWordsPerMinute(deps.storage),
+                ]);
             stored = library;
             store.update({
                 library: shown(library),
                 demo: false,
                 highlightOnAo3,
+                wordsPerMinute,
             });
         },
 
@@ -232,6 +239,100 @@ export function createDashboardController(
                 const known = error instanceof SyncError;
                 if (known && error.code === 'aborted') {
                     setSync({ notice: 'Sync stopped.' });
+                } else {
+                    setSync({
+                        error: {
+                            code: known ? error.code : 'unknown',
+                            message:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                        },
+                    });
+                }
+            } finally {
+                abort = null;
+                setSync({ running: false, progress: null });
+            }
+        },
+
+        async checkFeedback() {
+            const { sync, demo } = store.get();
+            if (sync.running || demo || !stored) {
+                return;
+            }
+            const works = feedbackCandidates(
+                hideRemoved(stored).works,
+                stored.feedback ?? {},
+            );
+            if (works.length === 0) {
+                setSync({
+                    error: null,
+                    notice:
+                        'Kudos and comments are up to date. Works you ' +
+                        'open later are checked next time.',
+                });
+                return;
+            }
+            const granted = await deps.requestAccess();
+            if (!granted) {
+                setSync({
+                    error: {
+                        code: 'no-permission',
+                        message:
+                            'The extension needs permission to read ' +
+                            'archiveofourown.org to check kudos and ' +
+                            'comments.',
+                    },
+                });
+                return;
+            }
+            abort = new AbortController();
+            store.update({ reviewOpen: false, reviewSessionAnswered: [] });
+            setSync({
+                running: true,
+                error: null,
+                notice: null,
+                progress: null,
+            });
+            const { username } = stored;
+            try {
+                await runFeedbackScan({
+                    username,
+                    works,
+                    feedback: stored.feedback ?? {},
+                    fetchText: deps.fetchText,
+                    parseHtml: deps.parseHtml,
+                    sleep: deps.sleep,
+                    signal: abort.signal,
+                    delayMs: deps.delayMs,
+                    now: deps.now,
+                    save: async (feedback) => {
+                        if (stored?.username !== username) {
+                            return;
+                        }
+                        const next = { ...stored, feedback };
+                        await saveLibrary(deps.storage, next);
+                        stored = next;
+                        store.update({ library: shown(next) });
+                    },
+                    onProgress: (progress) => {
+                        setSync({ progress });
+                    },
+                });
+                setSync({
+                    notice:
+                        `Checked kudos and comments on ` +
+                        `${plural(works.length, 'work')}.`,
+                });
+            } catch (error) {
+                const known = error instanceof SyncError;
+                if (known && error.code === 'aborted') {
+                    setSync({
+                        notice:
+                            'Check stopped. What was found so far is ' +
+                            'saved; the next check goes on from there.',
+                    });
                 } else {
                     setSync({
                         error: {
@@ -393,6 +494,10 @@ export function createDashboardController(
             }));
         },
 
+        showView(view) {
+            store.update({ view });
+        },
+
         toggleExpanded(id) {
             store.update((state) => ({
                 expanded: { ...state.expanded, [id]: !state.expanded[id] },
@@ -455,6 +560,46 @@ export function createDashboardController(
         async setHighlightOnAo3(highlightOnAo3) {
             store.update({ highlightOnAo3 });
             await saveHighlightSetting(deps.storage, highlightOnAo3);
+        },
+
+        async setWordsPerMinute(value) {
+            const wordsPerMinute = clampWordsPerMinute(value);
+            store.update({ wordsPerMinute });
+            await saveWordsPerMinute(deps.storage, wordsPerMinute);
+        },
+
+        startSpeedTest() {
+            store.update({
+                speedTest: {
+                    startedAt: deps.now().getTime(),
+                    result: null,
+                    tooFast: false,
+                },
+            });
+        },
+
+        finishSpeedTest(words) {
+            const { startedAt } = store.get().speedTest;
+            if (startedAt === null) {
+                return;
+            }
+            const elapsed = deps.now().getTime() - startedAt;
+            const tooFast = elapsed < MIN_SPEED_TEST_MS;
+            store.update({
+                speedTest: {
+                    startedAt: null,
+                    result: tooFast
+                        ? null
+                        : clampWordsPerMinute((words * 60_000) / elapsed),
+                    tooFast,
+                },
+            });
+        },
+
+        resetSpeedTest() {
+            store.update({
+                speedTest: { startedAt: null, result: null, tooFast: false },
+            });
         },
 
         dismissMessage() {

@@ -1,4 +1,4 @@
-export type { BootOptions } from './bootDashboard';
+export type { BootOptions } from './BootOptions';
 export {
     AO3_MATCH_PATTERN,
     DEMO_QUERY_PARAM,

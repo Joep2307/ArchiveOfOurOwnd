@@ -5,7 +5,6 @@ import {
     formatNumber,
 } from '@/format';
 import type { Stats } from '@/stats';
-import { WORDS_PER_MINUTE } from '@/stats';
 import { el } from './el';
 import { renderStatTile } from './renderStatTile';
 
@@ -19,7 +18,10 @@ function perAuthor(works: number, authors: number): string {
 }
 
 /** The row of headline numbers. */
-export function renderOverview(stats: Stats): HTMLElement {
+export function renderOverview(
+    stats: Stats,
+    wordsPerMinute: number,
+): HTMLElement {
     const { totals, wordSummary, visitSummary } = stats;
     const hidden = totals.deleted + totals.mystery;
     const novels =
@@ -67,8 +69,8 @@ export function renderOverview(stats: Stats): HTMLElement {
             renderStatTile(
                 'Estimated reading time',
                 `~${formatDuration(totals.readingMinutes)}`,
-                `based on ${WORDS_PER_MINUTE} words a minute, ` +
-                    'not time tracked',
+                `based on ${formatNumber(wordsPerMinute)} words a ` +
+                    'minute (change it under Advanced)',
             ),
             renderStatTile(
                 'Visits',

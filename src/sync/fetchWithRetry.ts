@@ -1,16 +1,8 @@
 import { MAX_RETRIES } from './constants';
-import type { FetchText, FetchTextResult } from './FetchText';
+import type { RetryOptions } from './RetryOptions';
+import type { FetchTextResult } from './FetchTextResult';
 import { retryWaitMs } from './retryWaitMs';
 import { SyncError } from './SyncError';
-import type { Sleep } from './Sleep';
-
-export type RetryOptions = {
-    fetchText: FetchText;
-    sleep: Sleep;
-    signal?: AbortSignal | undefined;
-    /** Called before each wait, so the UI can say why it paused. */
-    onWait?: ((ms: number, status: number) => void) | undefined;
-};
 
 /** Fetches a page, waiting and retrying on 429 and 5xx. */
 export async function fetchWithRetry(

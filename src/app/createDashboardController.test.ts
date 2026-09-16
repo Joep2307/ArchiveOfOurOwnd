@@ -2,6 +2,7 @@ import { createDemoLibrary } from '@/demo';
 import {
     createMemoryStorage,
     loadActiveLibrary,
+    loadWordsPerMinute,
     saveLibrary,
 } from '@/storage';
 import { loadCore } from '../../tests/loadCore';
@@ -14,6 +15,12 @@ async function setup() {
     const library = createDemoLibrary(10);
     await saveLibrary(storage, library);
     const store = createStore(createInitialState(true));
+    let time = new Date(2026, 8, 16).getTime();
+    const clock = {
+        advance: (ms: number) => {
+            time += ms;
+        },
+    };
     const controller = createDashboardController(store, {
         storage,
         core: loadCore(),
@@ -24,11 +31,11 @@ async function setup() {
         requestAccess: () => Promise.resolve(true),
         download: () => undefined,
         confirm: () => true,
-        now: () => new Date(2026, 8, 16),
+        now: () => new Date(time),
         createDemo: () => createDemoLibrary(10),
     });
     await controller.load();
-    return { storage, library, store, controller };
+    return { storage, library, store, controller, clock };
 }
 
 describe('removing works', () => {
@@ -64,5 +71,39 @@ describe('removing works', () => {
         expect(store.get().library?.works).toHaveLength(library.works.length);
         expect(store.get().sync.notice).toBe('Restored 2 removed works.');
         expect((await loadActiveLibrary(storage))?.removed).toEqual([]);
+    });
+});
+
+describe('reading speed', () => {
+    it('loads, clamps and saves the words per minute', async () => {
+        const { storage, store, controller } = await setup();
+        expect(store.get().wordsPerMinute).toBe(250);
+
+        await controller.setWordsPerMinute(99_999);
+        expect(store.get().wordsPerMinute).toBe(1500);
+
+        await controller.setWordsPerMinute(312.4);
+        expect(await loadWordsPerMinute(storage)).toBe(312);
+    });
+
+    it('measures a speed test', async () => {
+        const { store, controller, clock } = await setup();
+        controller.startSpeedTest();
+        clock.advance(60_000);
+        controller.finishSpeedTest(300);
+        expect(store.get().speedTest).toEqual({
+            startedAt: null,
+            result: 300,
+            tooFast: false,
+        });
+    });
+
+    it('ignores a test finished in a few seconds', async () => {
+        const { store, controller, clock } = await setup();
+        controller.startSpeedTest();
+        clock.advance(1_000);
+        controller.finishSpeedTest(300);
+        expect(store.get().speedTest.result).toBeNull();
+        expect(store.get().speedTest.tooFast).toBe(true);
     });
 });

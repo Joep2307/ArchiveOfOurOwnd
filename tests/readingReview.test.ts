@@ -7,7 +7,7 @@ import {
 } from '@/storage';
 import { parseLibraryFile } from '@/export';
 import { loadCore } from './loadCore';
-import { reviewCandidates } from '@/stats/reviewCandidates';
+import { reviewCandidates } from '@/stats';
 
 async function openReview(root: HTMLElement): Promise<void> {
     await vi.waitFor(() => {

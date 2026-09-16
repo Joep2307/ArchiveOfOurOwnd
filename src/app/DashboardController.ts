@@ -1,6 +1,6 @@
-import type { ReadingReview } from '@/model/Library';
-import type { Work } from '@/model';
+import type { ReadingReview, Work } from '@/model';
 import type { Facet, Period, RankMetric } from '@/stats';
+import type { DashboardView } from './DashboardView';
 import type { LengthOrder } from './LengthOrder';
 import type { SortKey } from './SortKey';
 
@@ -13,6 +13,12 @@ export type DashboardController = {
     ) => Promise<void>;
     load: () => Promise<void>;
     sync: (full: boolean) => Promise<void>;
+    /**
+     * Looks up on AO3 which works the reader left kudos or comments
+     * on. Only checks works that are new or opened since last time.
+     */
+    checkFeedback: () => Promise<void>;
+    /** Stops the running sync or kudos and comments check. */
     stopSync: () => void;
     showDemo: () => void;
     hideDemo: () => void;
@@ -32,10 +38,18 @@ export type DashboardController = {
     removeWork: (work: Work) => Promise<void>;
     /** Brings back every removed work. */
     restoreRemoved: () => Promise<void>;
+    /** Opens a page from the menu. */
+    showView: (view: DashboardView) => void;
     setPage: (page: number) => void;
     toggleExpanded: (id: string) => void;
     setRankBy: (metric: RankMetric) => void;
     setTheme: (theme: 'system' | 'light' | 'dark') => void;
     setHighlightOnAo3: (enabled: boolean) => Promise<void>;
+    /** Saves the reader's speed; out-of-range values are clamped. */
+    setWordsPerMinute: (wordsPerMinute: number) => Promise<void>;
+    startSpeedTest: () => void;
+    /** Stops the test and measures the speed over `words` words. */
+    finishSpeedTest: (words: number) => void;
+    resetSpeedTest: () => void;
     dismissMessage: () => void;
 };

@@ -1,6 +1,6 @@
 import { formatNumber, plural } from '@/format';
-import type { ReadingReview } from '@/model/Library';
-import { reviewCandidates } from '@/stats/reviewCandidates';
+import type { ReadingReview } from '@/model';
+import { reviewCandidates } from '@/stats';
 import { el } from './el';
 import { renderPanel } from './renderPanel';
 import { renderSection } from './renderSection';

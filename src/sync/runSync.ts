@@ -6,35 +6,13 @@ import {
     MAX_PAGE_DELAY_MS,
     PAGE_DELAY_MS,
 } from './constants';
-import type { FetchText, FetchTextResult } from './FetchText';
+import type { FetchTextResult } from './FetchTextResult';
 import { fetchWithRetry } from './fetchWithRetry';
 import { isPageUnchanged } from './isPageUnchanged';
 import { mergeWorks } from './mergeWorks';
 import { readingsUrl } from './readingsUrl';
-import type { Sleep } from './Sleep';
+import type { SyncOptions } from './SyncOptions';
 import { SyncError } from './SyncError';
-import type { SyncProgress } from './SyncProgress';
-
-export type SyncOptions = {
-    fetchText: FetchText;
-    parseHtml: (html: string) => Document;
-    sleep: Sleep;
-    /** Loads what is stored for an account, if anything. */
-    loadStored: (username: string) => Promise<Library | null>;
-    /** Persists partial and final results. */
-    save: (library: Library) => Promise<void>;
-    /**
-     * Account synced last. When given, the login check reads the
-     * first history page instead of an extra request for AO3's home.
-     */
-    username?: string | undefined;
-    /** Re-read every page instead of stopping at known ones. */
-    full?: boolean;
-    delayMs?: number;
-    signal?: AbortSignal;
-    now?: () => Date;
-    onProgress?: (progress: SyncProgress) => void;
-};
 
 function isLoginPage(url: string): boolean {
     return url.includes('/users/login');

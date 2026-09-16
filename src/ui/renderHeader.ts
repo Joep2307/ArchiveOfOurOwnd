@@ -120,6 +120,11 @@ export function renderHeader(
                         !library?.works.some((work) => work.kind === 'work'),
                 },
             ),
+            menuItem(
+                'Check kudos and comments',
+                () => void controller.checkFeedback(),
+                { disabled: sync.running || standalone || demo || !hasData },
+            ),
             menuItem('Export JSON (backup)', controller.exportJson, {
                 disabled: !hasData,
             }),
@@ -144,6 +149,9 @@ export function renderHeader(
                 () => void controller.setHighlightOnAo3(!state.highlightOnAo3),
                 { disabled: standalone },
             ),
+            menuItem('Advanced settings…', () => {
+                controller.showView('settings');
+            }),
             menuItem(
                 `Restore removed works (${removedCount})`,
                 () => void controller.restoreRemoved(),
