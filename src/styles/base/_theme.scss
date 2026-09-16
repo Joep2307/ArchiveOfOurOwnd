@@ -1,0 +1,22 @@
+@use '../abstracts' as *;
+
+:root {
+    @include emit-tokens;
+    @include emit-colors($light);
+
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme='light'])) {
+        @include emit-colors($dark);
+
+        color-scheme: dark;
+    }
+}
+
+:root[data-theme='dark'] {
+    @include emit-colors($dark);
+
+    color-scheme: dark;
+}

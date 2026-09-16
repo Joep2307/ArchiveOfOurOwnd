@@ -1,0 +1,27 @@
+@use '../abstracts' as *;
+
+.tile {
+    padding: var(--space-4);
+    border: var(--size-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+}
+
+.tile__label {
+    color: var(--color-ink-secondary);
+    font-size: var(--text-sm);
+}
+
+.tile__value {
+    margin-top: var(--space-1);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--line-tight);
+    overflow-wrap: anywhere;
+}
+
+.tile__note {
+    margin-top: var(--space-1);
+    color: var(--color-ink-muted);
+    font-size: var(--text-xs);
+}

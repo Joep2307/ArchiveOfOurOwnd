@@ -1,0 +1,1 @@
+function e(){let e=globalThis,t=e.browser??e.chrome;return t?.runtime?.id?t:null}export{e as t};

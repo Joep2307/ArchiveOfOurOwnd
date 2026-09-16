@@ -1,0 +1,28 @@
+@mixin focus-ring {
+    outline: var(--size-gap) solid var(--color-focus);
+    outline-offset: var(--size-gap);
+}
+
+@mixin reset-button {
+    appearance: none;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    text-align: inherit;
+    cursor: pointer;
+}
+
+@mixin visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@mixin numeric {
+    font-variant-numeric: tabular-nums;
+}

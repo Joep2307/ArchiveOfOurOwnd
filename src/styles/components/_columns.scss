@@ -1,0 +1,99 @@
+@use '../abstracts' as *;
+
+.columns__area {
+    position: relative;
+    height: var(--size-chart);
+    margin-left: var(--space-7);
+}
+
+.columns__grid {
+    position: absolute;
+    inset: 0;
+}
+
+.columns__gridline {
+    position: absolute;
+    bottom: var(--value);
+    left: 0;
+    right: 0;
+    border-top: var(--size-hairline) solid var(--color-hairline);
+
+    &:first-child {
+        border-top-color: var(--color-baseline);
+    }
+
+    span {
+        position: absolute;
+        right: calc(100% + var(--space-2));
+        transform: translateY(-50%);
+        color: var(--color-ink-muted);
+        font-size: var(--text-xs);
+
+        @include numeric;
+    }
+}
+
+.columns__plot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: stretch;
+    gap: var(--size-gap);
+}
+
+.columns__col {
+    @include reset-button;
+
+    display: flex;
+    flex: 1 1 0;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 0;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+
+    &:hover:not(:disabled) {
+        background: var(--color-surface-sunken);
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+
+    &.is-active {
+        background: var(--color-info-soft);
+    }
+}
+
+.columns__bar {
+    display: block;
+    width: 100%;
+    max-width: var(--size-bar);
+    height: var(--value);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    background: var(--color-series-1);
+
+    .columns__col.is-active & {
+        background: var(--color-accent-strong);
+    }
+
+    &[data-empty] {
+        height: 0;
+    }
+}
+
+.columns__axis {
+    display: flex;
+    gap: var(--size-gap);
+    margin-top: var(--space-2);
+    margin-left: var(--space-7);
+}
+
+.columns__tick {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: visible;
+    color: var(--color-ink-muted);
+    font-size: var(--text-xs);
+    text-align: center;
+    white-space: nowrap;
+}

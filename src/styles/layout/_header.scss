@@ -1,0 +1,90 @@
+@use '../abstracts' as *;
+
+.header {
+    background: var(--color-surface);
+    border-bottom: var(--size-hairline) solid var(--color-hairline);
+}
+
+.header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-5);
+    max-width: var(--size-page);
+    margin-inline: auto;
+    padding: var(--space-4);
+
+    @include up(md) {
+        padding-inline: var(--space-6);
+    }
+}
+
+.header__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+// Three stacked "book spines" as the mark.
+.header__mark {
+    flex: none;
+    width: var(--size-mark);
+    height: var(--size-mark);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(
+                to top,
+                var(--color-series-1) 0 30%,
+                transparent 30% 36%,
+                var(--color-series-3) 36% 62%,
+                transparent 62% 68%,
+                var(--color-series-2) 68% 90%,
+                transparent 90%
+            )
+            center / 60% 70% no-repeat,
+        var(--color-surface-sunken);
+}
+
+.header__title {
+    font-size: var(--text-lg);
+}
+
+.header__tagline {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+}
+
+.header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+}
+
+.header__account {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-right: var(--space-2);
+    font-size: var(--text-sm);
+}
+
+.jump-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin-bottom: var(--space-5);
+    font-size: var(--text-sm);
+
+    a {
+        color: var(--color-ink-secondary);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--color-ink);
+            text-decoration: underline;
+        }
+    }
+}

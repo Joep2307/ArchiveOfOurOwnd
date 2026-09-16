@@ -1,0 +1,31 @@
+@use '../abstracts' as *;
+
+@keyframes progress-slide {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(340%);
+    }
+}
+
+.progress {
+    overflow: hidden;
+    height: var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-sunken);
+}
+
+.progress__bar {
+    display: block;
+    width: var(--value);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-accent);
+    transition: width var(--duration);
+
+    .progress.is-indeterminate & {
+        animation: progress-slide 1.4s ease-in-out infinite;
+    }
+}

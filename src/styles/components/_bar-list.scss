@@ -1,0 +1,73 @@
+@use '../abstracts' as *;
+
+.bar-list {
+    display: grid;
+    gap: var(--size-gap);
+}
+
+.bar-list__row {
+    @include reset-button;
+
+    display: grid;
+    grid-template-columns: var(--size-label-col) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--size-bar-row);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+
+    &:hover:not(:disabled) {
+        background: var(--color-surface-sunken);
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+
+    &.is-active {
+        background: var(--color-info-soft);
+        box-shadow: inset var(--size-gap) 0 0 var(--color-accent);
+    }
+
+    .bar-list--ranked & {
+        grid-template-columns:
+            var(--space-5) var(--size-label-col) minmax(0, 1fr)
+            auto;
+    }
+}
+
+.bar-list__rank {
+    color: var(--color-ink-muted);
+    font-size: var(--text-xs);
+
+    @include numeric;
+}
+
+.bar-list__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bar-list__track {
+    display: block;
+    height: calc(var(--size-bar) / 2);
+}
+
+.bar-list__bar {
+    display: block;
+    width: var(--value);
+    min-width: var(--size-gap);
+    height: 100%;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--color-series-1);
+}
+
+.bar-list__value {
+    color: var(--color-ink-secondary);
+    text-align: right;
+
+    @include numeric;
+}

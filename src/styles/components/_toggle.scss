@@ -1,0 +1,24 @@
+@use '../abstracts' as *;
+
+.toggle {
+    display: inline-flex;
+    padding: var(--size-gap);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-sunken);
+}
+
+.toggle__option {
+    @include reset-button;
+
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-ink-secondary);
+    font-size: var(--text-sm);
+
+    &.is-active {
+        background: var(--color-surface-raised);
+        color: var(--color-ink);
+        box-shadow: 0 var(--size-hairline) var(--space-1) var(--color-shadow);
+        font-weight: var(--weight-medium);
+    }
+}

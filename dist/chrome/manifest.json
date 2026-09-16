@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Reading Stats for AO3 (unofficial)",
+    "short_name": "Reading Stats",
+    "version": "0.1.0",
+    "description": "Statistics for your Archive of Our Own reading history: works, words, authors, fandoms, ships, tags, averages and trends. Stays in your browser.",
+    "icons": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+    },
+    "action": {
+        "default_title": "Open reading stats",
+        "default_icon": {
+            "16": "icons/icon-16.png",
+            "32": "icons/icon-32.png",
+            "48": "icons/icon-48.png",
+            "128": "icons/icon-128.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "storage",
+        "unlimitedStorage"
+    ],
+    "host_permissions": [
+        "https://archiveofourown.org/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    }
+}

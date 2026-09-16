@@ -1,0 +1,33 @@
+@use '../abstracts' as *;
+
+.filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: var(--size-hairline) solid var(--color-hairline);
+    background: color-mix(in srgb, var(--color-page) 92%, transparent);
+    backdrop-filter: blur(8px);
+}
+
+.filter-bar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    max-width: var(--size-page);
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-4);
+
+    @include up(md) {
+        padding-inline: var(--space-6);
+    }
+}
+
+.filter-bar__count {
+    margin-left: auto;
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+
+    @include numeric;
+}
