@@ -1,4 +1,4 @@
-import type { Library, Rating, Work } from '@/model';
+import type { Library, Rating, Work, WorkFeedback } from '@/model';
 import { RATINGS } from '@/model';
 import { toIsoDate } from '@/parse';
 import {
@@ -122,10 +122,22 @@ export function createDemoLibrary(
     works.sort((a, b) =>
         (b.lastVisited ?? '').localeCompare(a.lastVisited ?? ''),
     );
+    // Drawn after the works, so the works stay the same per seed.
+    const feedback: Record<string, WorkFeedback> = {};
+    for (const work of works) {
+        if (work.kind === 'work' && random() < 0.85) {
+            feedback[work.key] = {
+                kudos: random() < 0.35,
+                commented: random() < 0.08,
+                checkedAt: today.toISOString(),
+            };
+        }
+    }
     return {
         version: 1,
         username: DEMO_USERNAME,
         syncedAt: today.toISOString(),
         works,
+        feedback,
     };
 }
