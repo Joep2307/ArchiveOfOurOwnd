@@ -125,6 +125,25 @@ describe('runSync', () => {
         expect(requested).toHaveLength(4);
     });
 
+    it('uses page 1 as the login check for a known account', async () => {
+        const { options, requested } = setup(PAGES, null);
+        const library = await runSync({ ...options, username: 'me' });
+        expect(requested).toHaveLength(3);
+        expect(requested.some((url) => !url.includes('page='))).toBe(false);
+        expect(library.works).toHaveLength(5);
+    });
+
+    it('rereads page 1 when another account is logged in', async () => {
+        const { options, requested } = setup(PAGES, null);
+        const library = await runSync({ ...options, username: 'old' });
+        expect(requested[0]).toContain('/users/old/');
+        expect(requested.slice(1)).toHaveLength(3);
+        expect(
+            requested.slice(1).every((url) => url.includes('/users/me/')),
+        ).toBe(true);
+        expect(library.username).toBe('me');
+    });
+
     it('fails clearly when logged out', async () => {
         const { options } = setup(PAGES, null);
         const loggedOut: FetchText = (url) =>
@@ -165,6 +184,34 @@ describe('runSync', () => {
         });
         expect(waits).toContain(7000);
         expect(library.works).toHaveLength(5);
+    });
+
+    it('keeps a slower pace after being rate limited', async () => {
+        const { options } = setup(PAGES, null);
+        let calls = 0;
+        const waits: number[] = [];
+        const flaky: FetchText = (url, signal) => {
+            calls += 1;
+            if (calls === 2) {
+                return Promise.resolve({
+                    status: 429,
+                    url,
+                    retryAfter: '7',
+                    text: '',
+                });
+            }
+            return options.fetchText(url, signal);
+        };
+        await runSync({
+            ...options,
+            fetchText: flaky,
+            delayMs: 1000,
+            sleep: (ms: number) => {
+                waits.push(ms);
+                return Promise.resolve();
+            },
+        });
+        expect(waits).toEqual([7000, 2000, 2000]);
     });
 
     it('stops when aborted', async () => {

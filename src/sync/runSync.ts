@@ -1,8 +1,12 @@
 import type { Library, Work } from '@/model';
 import { createEmptyLibrary } from '@/model';
 import { AO3_ORIGIN, parseReadingsPage, parseUsername } from '@/parse';
-import { CHECKPOINT_EVERY, PAGE_DELAY_MS } from './constants';
-import type { FetchText } from './FetchText';
+import {
+    CHECKPOINT_EVERY,
+    MAX_PAGE_DELAY_MS,
+    PAGE_DELAY_MS,
+} from './constants';
+import type { FetchText, FetchTextResult } from './FetchText';
 import { fetchWithRetry } from './fetchWithRetry';
 import { isPageUnchanged } from './isPageUnchanged';
 import { mergeWorks } from './mergeWorks';
@@ -19,6 +23,11 @@ export type SyncOptions = {
     loadStored: (username: string) => Promise<Library | null>;
     /** Persists partial and final results. */
     save: (library: Library) => Promise<void>;
+    /**
+     * Account synced last. When given, the login check reads the
+     * first history page instead of an extra request for AO3's home.
+     */
+    username?: string | undefined;
     /** Re-read every page instead of stopping at known ones. */
     full?: boolean;
     delayMs?: number;
@@ -43,6 +52,7 @@ export async function runSync(options: SyncOptions): Promise<Library> {
         loadStored,
         save,
         signal,
+        username: knownUsername,
         full = false,
         delayMs = PAGE_DELAY_MS,
         now = (): Date => new Date(),
@@ -52,12 +62,16 @@ export async function runSync(options: SyncOptions): Promise<Library> {
     let page = 0;
     let lastPage: number | null = null;
     const fresh: Work[] = [];
+    let pageDelay = delayMs;
 
     const retry = {
         fetchText,
         sleep,
         signal,
         onWait: (ms: number, status: number): void => {
+            if (status === 429) {
+                pageDelay = Math.min(pageDelay * 2, MAX_PAGE_DELAY_MS);
+            }
             onProgress({
                 phase: 'waiting',
                 page,
@@ -80,8 +94,32 @@ export async function runSync(options: SyncOptions): Promise<Library> {
         worksSeen: 0,
         message: 'Checking your AO3 login…',
     });
-    const home = await fetchWithRetry(`${AO3_ORIGIN}/`, retry);
-    const username = parseUsername(parseHtml(home.text));
+    // Every AO3 page shows who is logged in, so page 1 of the last
+    // synced account doubles as the login check.
+    const home = (): Promise<FetchTextResult> =>
+        fetchWithRetry(`${AO3_ORIGIN}/`, retry);
+    const checked =
+        knownUsername === undefined
+            ? await home()
+            : await fetchWithRetry(readingsUrl(knownUsername, 1), retry).catch(
+                  (error: unknown) => {
+                      // Another account's history may be refused outright.
+                      if (
+                          error instanceof SyncError &&
+                          error.code === 'http'
+                      ) {
+                          return home();
+                      }
+                      throw error;
+                  },
+              );
+    const username = isLoginPage(checked.url)
+        ? null
+        : parseUsername(parseHtml(checked.text));
+    const firstPage =
+        knownUsername !== undefined && username === knownUsername
+            ? checked
+            : null;
     if (!username) {
         throw new SyncError(
             'logged-out',
@@ -106,8 +144,9 @@ export async function runSync(options: SyncOptions): Promise<Library> {
     });
 
     for (page = 1; lastPage === null || page <= lastPage; page += 1) {
-        if (page > 1) {
-            await sleep(delayMs, signal);
+        const reuse = page === 1 ? firstPage : null;
+        if (!reuse && (page > 1 || knownUsername !== undefined)) {
+            await sleep(pageDelay, signal);
         }
         onProgress({
             phase: 'page',
@@ -119,10 +158,9 @@ export async function runSync(options: SyncOptions): Promise<Library> {
                 : `Reading page ${page}…`,
         });
 
-        const result = await fetchWithRetry(
-            readingsUrl(username, page),
-            retry,
-        );
+        const result =
+            reuse ??
+            (await fetchWithRetry(readingsUrl(username, page), retry));
         if (isLoginPage(result.url)) {
             throw new SyncError(
                 'logged-out',

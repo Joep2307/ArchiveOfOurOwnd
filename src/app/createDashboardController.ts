@@ -198,6 +198,7 @@ export function createDashboardController(
                     sleep: deps.sleep,
                     signal: abort.signal,
                     full,
+                    username: stored?.username,
                     now: deps.now,
                     ...(deps.delayMs === undefined
                         ? {}

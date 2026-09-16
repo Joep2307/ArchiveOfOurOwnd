@@ -7,6 +7,7 @@ export type { SyncProgress } from './SyncProgress';
 export {
     CHECKPOINT_EVERY,
     DATE_TOLERANCE_DAYS,
+    MAX_PAGE_DELAY_MS,
     MAX_RETRIES,
     PAGE_DELAY_MS,
     RATE_LIMIT_WAIT_MS,
