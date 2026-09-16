@@ -38,7 +38,7 @@ export function countFacet(
         for (const value of new Set(facetValues(work, field))) {
             const entry = row(value);
             entry.works += 1;
-            entry.words += work.words;
+            entry.words += options.wordsRead?.(work) ?? work.words;
             entry.visits += work.visits;
         }
     }

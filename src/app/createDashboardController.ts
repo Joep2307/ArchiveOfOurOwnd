@@ -6,6 +6,7 @@ import {
     clampWordsPerMinute,
     filterWorks,
     MAX_WORDS_PER_MINUTE,
+    reviewCandidates,
     type Facet,
 } from '@/stats';
 import {
@@ -227,11 +228,9 @@ export function createDashboardController(
                     },
                 });
                 store.update({
-                    reviewOpen: Boolean(
-                        shown(library)?.works.some(
-                            (work) => work.kind === 'work',
-                        ),
-                    ),
+                    reviewOpen: reviewCandidates(
+                        shown(library)?.works ?? [],
+                    ).some((work) => !library.reviews?.[work.key]),
                 });
                 const added = library.works.length - before;
                 setSync({

@@ -284,10 +284,9 @@ export function renderReadingReview({
                 text:
                     `${formatNumber(confirmed)} words confirmed, ` +
                     'including full rereads. ' +
-                    'Dashboard totals still describe imported ' +
-                    'history and remain ' +
-                    'estimates; partial and uncertain reads are ' +
-                    'not confirmed here.',
+                    'Dashboard stats update with your answers. ' +
+                    'Not-read works are excluded; unreviewed, partial ' +
+                    'and uncertain works remain estimates.',
             }),
             el('p', {
                 className: 'muted',

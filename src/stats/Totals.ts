@@ -6,6 +6,8 @@ export type Totals = {
     deleted: number;
     mystery: number;
     words: number;
+    confirmedWords: number;
+    estimatedWords: number;
     visits: number;
     authors: number;
     fandoms: number;
@@ -14,7 +16,7 @@ export type Totals = {
     tags: number;
     series: number;
     languages: number;
-    /** Works opened more than once. */
+    /** Works explicitly confirmed as read more than once. */
     rereads: number;
     complete: number;
     inProgress: number;

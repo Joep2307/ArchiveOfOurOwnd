@@ -8,6 +8,7 @@ import {
 import { parseLibraryFile } from '@/export';
 import { loadCore } from './loadCore';
 import { reviewCandidates } from '@/stats';
+import { formatCompact } from '@/format';
 
 async function openReview(root: HTMLElement): Promise<void> {
     await vi.waitFor(() => {
@@ -103,6 +104,19 @@ describe('biggest reads review', () => {
             expect(
                 root.querySelectorAll('.reading-review-list select'),
             ).toHaveLength(candidates.length);
+            const total =
+                library.works
+                    .filter((w) => w.kind === 'work')
+                    .reduce((sum, work) => sum + work.words, 0) +
+                longest.words;
+            const tile = [...root.querySelectorAll('.tile')].find(
+                (item) =>
+                    item.querySelector('.tile__label')?.textContent ===
+                    'Words read',
+            );
+            expect(tile?.querySelector('.tile__value')?.textContent).toBe(
+                formatCompact(total),
+            );
             expect(root.textContent).toContain(
                 'Saved. This work leaves the list when you close.',
             );

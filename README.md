@@ -139,6 +139,8 @@ scripts/        build, zip, preview
 After a successful sync, a **Review reading history** popup combines your ten
 longest visible works with your ten most-visited works (more than one visit),
 without duplicates. The selection is independent of search and chart filters.
+It opens automatically only when that selection has unreviewed works. Once
+reviewed, later syncs stay quiet unless new unreviewed works enter the selection.
 Choose **Read once**, **Read multiple times**, **Not read**, or **Not sure**.
 **Read once** saves one full read immediately. **Read multiple times** reveals
 a count field (minimum two); press **Save read count** to finish that answer.
@@ -153,8 +155,16 @@ Close it with **Done / close** or Escape, and reopen it from
 
 Confirmed words use the word count shown when you reviewed the work; later
 updates do not increase that confirmation. Partial reads remain unquantified.
-The review section shows confirmed words separately; the existing dashboard
-statistics still describe imported history, not verified reading completion.
+Dashboard statistics update immediately: not-read works are excluded, full
+reads use their saved word-count snapshot multiplied by the confirmed count,
+and unreviewed or uncertain works remain estimates. Average lengths count each
+work once; confirmed rereads never use AO3 visit counts. The All works table
+and AO3 visit totals retain the imported history. Undo restores the estimate.
+
+**Not read** is not permanent: if a later sync detects an increased AO3 visit
+count or a clearly later visit date, that answer clears and the work returns
+to estimated reading statistics. It can be reviewed again if it belongs to
+the longest/most-visited selection. A new visit does not confirm completion.
 
 For multiple reads, the count includes the first read and is independent of
 AO3 visits. Other answers do not show or require a count.
