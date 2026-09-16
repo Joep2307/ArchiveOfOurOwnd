@@ -3,14 +3,14 @@
 // writes them to CSS custom properties so themes switch at runtime.
 
 $light: (
-    page: #fff,
-    surface: #fff,
+    page: #f5f0e8,
+    surface: #fffcf7,
     surface-raised: #fff,
-    surface-sunken: #f2f2f2,
-    ink: #000,
-    ink-secondary: #3d3d3d,
-    ink-muted: #6b6b6b,
-    hairline: #dcdcdc,
+    surface-sunken: #ebe5dd,
+    ink: #171827,
+    ink-secondary: #50505b,
+    ink-muted: #6b6462,
+    hairline: #ded6cc,
     baseline: #000,
     border: #000,
     rule: #000,
@@ -18,8 +18,8 @@ $light: (
     accent-strong: #6b0000,
     accent-soft: #f5e6e6,
     accent-ink: #fff,
-    series-1: #000,
-    series-2: #900,
+    series-1: #aa3439,
+    series-2: #8a76bf,
     series-3: #8a8a8a,
     series-4: #cfcfcf,
     good: #000,
@@ -36,14 +36,14 @@ $light: (
 );
 
 $dark: (
-    page: #000,
-    surface: #000,
-    surface-raised: #0f0f0f,
-    surface-sunken: #1a1a1a,
+    page: #20202b,
+    surface: #292936,
+    surface-raised: #30303e,
+    surface-sunken: #333340,
     ink: #fff,
     ink-secondary: #c8c8c8,
     ink-muted: #999,
-    hairline: #2e2e2e,
+    hairline: #484452,
     baseline: #fff,
     border: #fff,
     rule: #fff,
@@ -91,11 +91,11 @@ $text: (
     4xl: 4.5rem,
 );
 
-// Swiss: square corners everywhere. Pill stays for true dots only.
+// Soft cards and compact rounded controls.
 $radius: (
-    sm: 0,
-    md: 0,
-    lg: 0,
+    sm: 8px,
+    md: 16px,
+    lg: 24px,
     pill: 999px,
 );
 
@@ -106,7 +106,7 @@ $size: (
     bar: 24px,
     bar-row: 28px,
     chart: 220px,
-    page: 1200px,
+    page: 1440px,
     label-col: 40%,
     touch: 36px,
     mark: 28px,

@@ -1,9 +1,16 @@
+import type { ReadingReview } from '@/model/Library';
 import type { Work } from '@/model';
 import type { Facet, Period, RankMetric } from '@/stats';
 import type { LengthOrder } from './LengthOrder';
 import type { SortKey } from './SortKey';
 
 export type DashboardController = {
+    setReviewOpen: (open: boolean) => void;
+    reviewWork: (
+        key: string,
+        status: ReadingReview['status'] | null,
+        readCount?: number,
+    ) => Promise<void>;
     load: () => Promise<void>;
     sync: (full: boolean) => Promise<void>;
     stopSync: () => void;

@@ -5,6 +5,8 @@ export function createInitialState(standalone: boolean): DashboardState {
     return {
         library: undefined,
         demo: false,
+        reviewOpen: false,
+        reviewSessionAnswered: [],
         standalone,
         filter: emptyFilter(),
         sync: { running: false, progress: null, error: null, notice: null },

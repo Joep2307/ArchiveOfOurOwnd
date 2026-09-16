@@ -1,5 +1,14 @@
 import type { Work } from './Work';
 
+export type ReadingReview = {
+    status: 'finished' | 'partial' | 'opened' | 'unsure';
+    /** Snapshot: later updates must not inflate confirmed reading. */
+    words: number;
+    reviewedAt: string;
+    /** Full reads, independent of visits. Older finished reviews mean 1. */
+    readCount?: number;
+};
+
 /** Everything the extension stores about one AO3 account. */
 export type Library = {
     version: 1;
@@ -13,4 +22,5 @@ export type Library = {
      * sync finds them again.
      */
     removed?: string[];
+    reviews?: Record<string, ReadingReview>;
 };

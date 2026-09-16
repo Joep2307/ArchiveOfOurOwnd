@@ -32,6 +32,7 @@ export function createDashboardController(
 ): DashboardController {
     let abort: AbortController | null = null;
     let stored: Library | null = null;
+    let reviewQueue = Promise.resolve();
 
     const resetView = (): Partial<DashboardState> => ({
         table: { ...store.get().table, page: 0 },
@@ -69,6 +70,84 @@ export function createDashboardController(
     };
 
     return {
+        setReviewOpen(reviewOpen) {
+            store.update({
+                reviewOpen,
+                ...(!reviewOpen ? { reviewSessionAnswered: [] } : {}),
+            });
+        },
+
+        reviewWork(key, status, readCount) {
+            if (
+                readCount !== undefined &&
+                (!Number.isSafeInteger(readCount) || readCount < 1)
+            ) {
+                return Promise.resolve();
+            }
+            const saveReview = async (): Promise<void> => {
+                const { demo, library, sync } = store.get();
+                if (!library || sync.running) return;
+                const base = demo ? library : stored;
+                const work = base?.works.find((item) => item.key === key);
+                if (!base || work?.kind !== 'work') return;
+                const reviews = Object.fromEntries(
+                    Object.entries(base.reviews ?? {}).filter(
+                        ([id]) => id !== key,
+                    ),
+                );
+                const previous = base.reviews?.[key];
+                if (status !== null)
+                    reviews[key] = {
+                        status,
+                        words:
+                            readCount !== undefined &&
+                            previous?.status === 'finished'
+                                ? previous.words
+                                : work.words,
+                        ...(status === 'finished'
+                            ? {
+                                  readCount:
+                                      readCount ??
+                                      (previous?.status === 'finished'
+                                          ? (previous.readCount ?? 1)
+                                          : 1),
+                              }
+                            : {}),
+                        reviewedAt: deps.now().toISOString(),
+                    };
+                const next = { ...base, reviews };
+                try {
+                    if (!demo) {
+                        await saveLibrary(deps.storage, next);
+                        stored = next;
+                    }
+                    store.update((state) => ({
+                        library: shown(next),
+                        reviewSessionAnswered:
+                            state.reviewOpen && status
+                                ? [
+                                      ...new Set([
+                                          ...state.reviewSessionAnswered,
+                                          key,
+                                      ]),
+                                  ]
+                                : state.reviewSessionAnswered,
+                    }));
+                } catch {
+                    setSync({
+                        error: {
+                            code: 'unknown',
+                            message:
+                                'Could not save your review. ' +
+                                'Please try again.',
+                        },
+                    });
+                }
+            };
+            reviewQueue = reviewQueue.then(saveReview);
+            return reviewQueue;
+        },
+
         async load() {
             const [library, highlightOnAo3] = await Promise.all([
                 loadActiveLibrary(deps.storage),
@@ -99,7 +178,12 @@ export function createDashboardController(
                 return;
             }
             abort = new AbortController();
-            store.update({ demo: false, library: shown(stored) });
+            store.update({
+                demo: false,
+                library: shown(stored),
+                reviewOpen: false,
+                reviewSessionAnswered: [],
+            });
             setSync({
                 running: true,
                 error: null,
@@ -128,6 +212,13 @@ export function createDashboardController(
                     onProgress: (progress) => {
                         setSync({ progress });
                     },
+                });
+                store.update({
+                    reviewOpen: Boolean(
+                        shown(library)?.works.some(
+                            (work) => work.kind === 'work',
+                        ),
+                    ),
                 });
                 const added = library.works.length - before;
                 setSync({

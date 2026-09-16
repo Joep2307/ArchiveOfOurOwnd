@@ -22,6 +22,9 @@ export default defineConfig({
         format: 'es',
     },
     server: {
-        open: '/dashboard.html?demo',
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        open: false,
     },
 });

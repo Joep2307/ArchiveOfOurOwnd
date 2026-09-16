@@ -109,6 +109,17 @@ export function renderHeader(
             menuItem('Full re-sync', () => void controller.sync(true), {
                 disabled: sync.running || standalone,
             }),
+            menuItem(
+                'Review reading history',
+                () => {
+                    controller.setReviewOpen(true);
+                },
+                {
+                    disabled:
+                        sync.running ||
+                        !library?.works.some((work) => work.kind === 'work'),
+                },
+            ),
             menuItem('Export JSON (backup)', controller.exportJson, {
                 disabled: !hasData,
             }),
@@ -171,6 +182,7 @@ export function renderHeader(
                 { className: 'header__brand' },
                 el('span', {
                     className: 'header__mark',
+                    text: 'A³',
                     attrs: { 'aria-hidden': true },
                 }),
                 el(
@@ -178,11 +190,11 @@ export function renderHeader(
                     {},
                     el('h1', {
                         className: 'header__title',
-                        text: 'Reading Stats',
+                        text: 'Your reading room',
                     }),
                     el('p', {
                         className: 'header__tagline',
-                        text: 'for your AO3 history · unofficial',
+                        text: 'AO3 history, a little more you · unofficial',
                     }),
                 ),
             ),

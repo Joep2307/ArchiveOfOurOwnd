@@ -42,6 +42,11 @@ addons.mozilla.org.)
 
 ## How syncing works
 
+- Opening the extension dashboard automatically starts an incremental sync.
+  Saved statistics stay visible while it runs. Demo previews do not sync.
+  If you are logged out or access is missing, the dashboard shows an error;
+  log in or grant access, then use **Sync now** to retry.
+
 - It reads `archiveofourown.org/users/<you>/readings`, one page at a
   time, with a 1.5 second pause between pages. If AO3 says “slow
   down”, it waits and tries again.
@@ -81,7 +86,10 @@ Terminal, from this folder:
 4. Or rebuild automatically on every save: `pnpm dev`
    (then press the reload ↻ button on `chrome://extensions`)
 5. Design without the extension, with demo data, in a normal tab:
-   `pnpm preview`
+   `pnpm preview`, then open `http://127.0.0.1:5173/dashboard.html?demo`
+   yourself. It updates the same dashboard as you edit the source files.
+   The command never opens browser windows, and refuses to start another
+   server if port 5173 is already in use.
 6. Run the checks: `pnpm typecheck`, `pnpm lint`, `pnpm test`
 7. Make zip files for sharing: `pnpm build:ext && pnpm zip`
 
@@ -124,3 +132,33 @@ scripts/        build, zip, preview
 ```
 
 `TODO.md` has the plan and what is done.
+
+## Review your reading history
+
+After a successful sync, a **Review reading history** popup combines your ten
+longest visible works with your ten most-visited works (more than one visit),
+without duplicates. The selection is independent of search and chart filters.
+Choose **Read once**, **Read multiple times**, **Not read**, or **Not sure**.
+**Read once** saves one full read immediately. **Read multiple times** reveals
+a count field (minimum two); press **Save read count** to finish that answer.
+Answers save locally,
+survive re-syncs, and travel with JSON backups. Each answered work leaves the
+queue when you close the popup and stays out on reopening. Answers are saved
+immediately and remain visible for corrections until closing.
+Open **Reviewed works** to edit
+full-read counts or **Undo review**. The queue does not refill after each answer.
+Close it with **Done / close** or Escape, and reopen it from
+**Options → Review reading history**. Demo answers do not change saved history.
+
+Confirmed words use the word count shown when you reviewed the work; later
+updates do not increase that confirmation. Partial reads remain unquantified.
+The review section shows confirmed words separately; the existing dashboard
+statistics still describe imported history, not verified reading completion.
+
+For multiple reads, the count includes the first read and is independent of
+AO3 visits. Other answers do not show or require a count.
+Confirmed words include these full rereads. Editing the count preserves the
+original reviewed word count, even if the work has since grown.
+
+Review cards have a collapsed **Show story summary** option and an
+**Open on AO3** link that opens the story in a new tab.

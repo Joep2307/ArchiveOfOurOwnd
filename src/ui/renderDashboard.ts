@@ -6,7 +6,8 @@ import { el } from './el';
 import type { FilterBar } from './FilterBar';
 import { renderDistributions } from './renderDistributions';
 import { renderHeader } from './renderHeader';
-import { renderNav } from './renderNav';
+import { renderReadingHero } from './renderReadingHero';
+import { renderReadingReview } from './renderReadingReview';
 import { renderOverview } from './renderOverview';
 import { renderStandouts } from './renderStandouts';
 import { renderSyncBanner } from './renderSyncBanner';
@@ -16,6 +17,7 @@ import { renderWelcome } from './renderWelcome';
 import { renderWorksTable } from './renderWorksTable';
 
 export type DashboardParts = {
+    review: HTMLDialogElement;
     header: HTMLElement;
     banner: HTMLElement;
     filterBar: FilterBar;
@@ -58,6 +60,13 @@ export function createDashboardRenderer(
         return [cache.matching, cache.stats];
     };
 
+    const closeReview = (): void => {
+        if (parts.review.open) {
+            parts.review.close();
+            parts.header.querySelector<HTMLElement>('summary')?.focus();
+        }
+    };
+
     return (state) => {
         const theme = document.documentElement;
         if (state.theme === 'system') {
@@ -69,6 +78,8 @@ export function createDashboardRenderer(
         parts.header.replaceChildren(renderHeader(state, controller, now()));
         const banner = renderSyncBanner(state, controller);
         parts.banner.replaceChildren(...(banner ? [banner] : []));
+
+        if (!state.reviewOpen || !state.library?.works.length) closeReview();
 
         if (state.library === undefined) {
             parts.filterBar.element.hidden = true;
@@ -92,8 +103,48 @@ export function createDashboardRenderer(
         );
 
         const context = { state, stats, controller };
+        if (state.reviewOpen) {
+            const historyOpen =
+                parts.review.querySelector<HTMLDetailsElement>(
+                    '.review-history',
+                )?.open ?? false;
+            const focusLabel = parts.review.contains(document.activeElement)
+                ? document.activeElement?.getAttribute('aria-label')
+                : null;
+            const scrollTop = parts.review.scrollTop;
+            parts.review.replaceChildren(
+                el('button', {
+                    className: 'button review-dialog__close',
+                    text: 'Done / close',
+                    attrs: { type: 'button', autofocus: true },
+                    on: {
+                        click: () => {
+                            controller.setReviewOpen(false);
+                        },
+                    },
+                }),
+                renderReadingReview(context),
+            );
+            const history =
+                parts.review.querySelector<HTMLDetailsElement>(
+                    '.review-history',
+                );
+            if (history) history.open = historyOpen;
+            if (!parts.review.open) parts.review.showModal();
+            if (focusLabel) {
+                const target = [
+                    ...parts.review.querySelectorAll<HTMLElement>(
+                        '[aria-label]',
+                    ),
+                ].find(
+                    (node) => node.getAttribute('aria-label') === focusLabel,
+                );
+                target?.focus({ preventScroll: true });
+            }
+            parts.review.scrollTop = scrollTop;
+        }
         parts.main.replaceChildren(
-            renderNav(),
+            renderReadingHero(state),
             renderOverview(stats),
             renderTimeline(context),
             renderDistributions(context),

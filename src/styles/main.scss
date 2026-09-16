@@ -1,3 +1,61 @@
 @use 'base';
 @use 'layout';
 @use 'components';
+@use 'reading-room';
+
+.reading-review-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: 1.5rem;
+    padding: 0;
+    list-style: none;
+
+    li {
+        padding: 1rem;
+        border: 1px solid currentcolor;
+        border-radius: 0.5rem;
+    }
+
+    select {
+        max-width: 100%;
+    }
+}
+
+.review-dialog {
+    width: min(64rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    padding: 1.5rem;
+    overflow: auto;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0.75rem;
+
+    &::backdrop {
+        background: rgb(0 0 0 / 60%);
+    }
+}
+
+.review-dialog__close {
+    display: block;
+    margin-left: auto;
+    margin-bottom: 1rem;
+}
+
+.review-history {
+    margin-top: 1.5rem;
+}
+
+.review-history__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-hairline);
+
+    .input {
+        width: 5rem;
+    }
+}

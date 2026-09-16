@@ -65,5 +65,7 @@ export async function bootDashboard(
     const params = new URLSearchParams(window.location.search);
     if (params.has(DEMO_QUERY_PARAM)) {
         controller.showDemo();
+    } else if (!standalone) {
+        void controller.sync(false);
     }
 }

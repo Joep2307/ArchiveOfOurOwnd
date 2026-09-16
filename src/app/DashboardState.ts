@@ -9,6 +9,9 @@ export type DashboardState = {
     library: Library | null | undefined;
     /** Showing generated demo data instead of the stored history. */
     demo: boolean;
+    reviewOpen: boolean;
+    /** Answers kept visible until the current popup closes. */
+    reviewSessionAnswered: string[];
     /** The dashboard runs outside the extension (local preview). */
     standalone: boolean;
     filter: WorkFilter;
