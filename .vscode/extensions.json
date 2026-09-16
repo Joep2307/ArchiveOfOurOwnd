@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "syler.sass-indented",
+        "stylelint.vscode-stylelint",
+        "rust-lang.rust-analyzer",
+        "vitest.explorer"
+    ]
+}

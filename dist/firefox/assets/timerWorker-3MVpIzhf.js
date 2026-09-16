@@ -1,1 +1,0 @@
-const e=self;e.addEventListener(`message`,t=>{let{id:n,ms:r}=t.data;setTimeout(()=>{e.postMessage({id:n})},r)});

@@ -1,5 +1,7 @@
 import type { BrowserTarget } from './BrowserTarget';
 import {
+    CONTENT_SCRIPT,
+    CONTENT_STYLE,
     EXTENSION_DESCRIPTION,
     EXTENSION_NAME,
     EXTENSION_PAGES_CSP,
@@ -37,6 +39,14 @@ export function createManifest(
         background,
         permissions: ['storage', 'unlimitedStorage'],
         host_permissions: [HOST_PERMISSION],
+        content_scripts: [
+            {
+                matches: [HOST_PERMISSION],
+                js: [CONTENT_SCRIPT],
+                css: [CONTENT_STYLE],
+                run_at: 'document_idle',
+            },
+        ],
         content_security_policy: {
             extension_pages: EXTENSION_PAGES_CSP,
         },

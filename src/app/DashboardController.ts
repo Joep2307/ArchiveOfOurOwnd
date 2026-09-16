@@ -21,5 +21,6 @@ export type DashboardController = {
     toggleExpanded: (id: string) => void;
     setRankBy: (metric: RankMetric) => void;
     setTheme: (theme: 'system' | 'light' | 'dark') => void;
+    setHighlightOnAo3: (enabled: boolean) => Promise<void>;
     dismissMessage: () => void;
 };

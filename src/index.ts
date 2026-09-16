@@ -1,6 +1,7 @@
 export * as app from './app';
 export * as background from './background';
 export * as browser from './browser';
+export * as content from './content';
 export * as dashboard from './dashboard';
 export * as demo from './demo';
 export * as exporting from './export';

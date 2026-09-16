@@ -54,9 +54,21 @@ addons.mozilla.org.)
   many times. The timeline groups works by that last visit.
 - “Words read” is the current length of each work, counted once.
 
+## On AO3 itself
+
+While you browse archiveofourown.org, works that are in your synced
+History get a green bar and a small **Read** badge (hover it for the
+last visit date and number of visits). Links to read works in
+descriptions and notes turn green. A work you open is marked right
+away, even before the next sync.
+
+AO3's top menu gets a **Reading stats** link that opens the dashboard
+(it says **Sync reading stats** until you have synced once). Switch
+the highlighting off under **Options → Highlight read works on AO3**.
+
 **Options** menu: full re-sync, export JSON (a backup), export CSV (the
 currently filtered works, opens in Excel/Numbers), import JSON, demo
-data, theme, and delete the stored history.
+data, theme, highlighting on AO3, and delete the stored history.
 
 ## Working on the code
 
@@ -90,7 +102,9 @@ need Rust if you change that crate:
 
 ```
 src/
-  exe/          entry points: dashboard.html/ts, background.ts
+  exe/          entry points: dashboard.html/ts, background.ts,
+                content.ts (runs on AO3 pages)
+  content/      highlights read works on AO3, adds the header link
   dashboard/    boots the page (browser APIs, wasm, storage)
   app/          state, sorting, all user actions
   ui/           everything you see; ui/charts for bars and columns

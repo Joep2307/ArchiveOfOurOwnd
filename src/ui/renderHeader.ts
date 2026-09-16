@@ -126,6 +126,13 @@ export function renderHeader(
                 controller.setTheme(nextTheme);
             }),
             menuItem(
+                `Highlight read works on AO3: ${
+                    state.highlightOnAo3 ? 'on' : 'off'
+                }`,
+                () => void controller.setHighlightOnAo3(!state.highlightOnAo3),
+                { disabled: standalone },
+            ),
+            menuItem(
                 'Delete stored history…',
                 () => void controller.clearData(),
                 { danger: true, disabled: demo || !hasData || sync.running },

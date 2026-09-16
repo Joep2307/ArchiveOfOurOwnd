@@ -1,0 +1,31 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+            - uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: wasm32-unknown-unknown
+            - uses: Swatinem/rust-cache@v2
+              with:
+                  workspaces: crates/stats-core
+            - run: cargo install wasm-pack --locked
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm build:wasm
+            - run: cargo test --manifest-path crates/stats-core/Cargo.toml
+            - run: pnpm typecheck
+            - run: pnpm lint
+            - run: pnpm test:smoke
+            - run: pnpm test
+            - run: pnpm build:ext

@@ -7,6 +7,7 @@
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { build, mergeConfig, type InlineConfig } from 'vite';
+import { CONTENT_SCRIPT, CONTENT_STYLE } from '../src/manifest/constants';
 import { createManifest } from '../src/manifest/createManifest';
 import type { BrowserTarget } from '../src/manifest/BrowserTarget';
 import baseConfig from '../vite.config';
@@ -39,15 +40,21 @@ async function writeTargets(version: string): Promise<void> {
     console.log(`✓ dist/chrome and dist/firefox (v${version})`);
 }
 
-async function main(): Promise<void> {
-    const version = await readVersion();
-    await mkdir(DIST, { recursive: true });
+const writeManifests = {
+    name: 'write-manifests',
+    async closeBundle() {
+        await writeTargets(await readVersion());
+    },
+};
 
-    const config: InlineConfig = mergeConfig(baseConfig, {
+/** Dashboard page and background worker, as ES modules. */
+function extensionConfig(): InlineConfig {
+    return mergeConfig(baseConfig, {
         configFile: false,
         mode: watch ? 'development' : 'production',
         build: {
             outDir: resolve(DIST, 'chrome'),
+            emptyOutDir: false,
             watch: watch ? {} : null,
             minify: !watch,
             rollupOptions: {
@@ -62,17 +69,42 @@ async function main(): Promise<void> {
                 },
             },
         },
-        plugins: [
-            {
-                name: 'write-manifests',
-                async closeBundle() {
-                    await writeTargets(version);
-                },
-            },
-        ],
+        plugins: [writeManifests],
     } satisfies InlineConfig);
+}
 
-    await build(config);
+/**
+ * The AO3 content script. Browsers load content scripts as classic
+ * scripts, so it is one self-contained IIFE plus its stylesheet.
+ */
+function contentConfig(): InlineConfig {
+    return mergeConfig(baseConfig, {
+        configFile: false,
+        mode: watch ? 'development' : 'production',
+        publicDir: false,
+        build: {
+            outDir: resolve(DIST, 'chrome'),
+            emptyOutDir: false,
+            copyPublicDir: false,
+            watch: watch ? {} : null,
+            minify: !watch,
+            lib: {
+                entry: resolve(ROOT, 'src/exe/content.ts'),
+                formats: ['iife'],
+                name: 'readingStatsContent',
+                fileName: () => CONTENT_SCRIPT,
+                cssFileName: CONTENT_STYLE.replace(/\.css$/, ''),
+            },
+        },
+        plugins: [writeManifests],
+    } satisfies InlineConfig);
+}
+
+async function main(): Promise<void> {
+    await rm(resolve(DIST, 'chrome'), { recursive: true, force: true });
+    await mkdir(DIST, { recursive: true });
+    await build(extensionConfig());
+    await build(contentConfig());
 }
 
 await main();

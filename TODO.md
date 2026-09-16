@@ -73,6 +73,85 @@ and a small Rust/wasm crate for the number crunching.
 - [x] Load the real extension in Chromium and sync against a fake AO3
 - [x] README with step-by-step install
 
+### 7. On AO3 itself: read works turn green + dashboard link
+
+A content script that runs on `archiveofourown.org`, reads the stored
+library (content scripts can use `storage.local` directly) and marks
+every work you have in History. Also adds a button that opens the
+dashboard.
+
+**Build + manifest**
+
+- [x] Entry point `src/exe/content.ts` (+ `src/content/` folder)
+- [x] Build it as a separate classic script (IIFE, no `import`s):
+      MV3 content scripts can't be ES modules. Second Vite build in
+      `scripts/build.ts` → `dist/<target>/content.js` (+ `content.css`)
+- [x] `createManifest`: add `content_scripts` with
+      `matches: ["https://archiveofourown.org/*"]`, `js`, `css`,
+      `run_at: "document_idle"`; update `createManifest.test.ts`
+- [x] Firefox: check the host permission is granted before the script
+      runs (MV3 host permissions are opt-in there). The script just
+      doesn't run until access is granted; the dashboard's first sync
+      already asks for it
+
+**Finding read works**
+
+- [x] Load the library for the logged-in user: `parseUsername(document)`
+      → `loadLibrary`, fall back to `loadActiveLibrary`
+- [x] Build a `Map<number, Work | null>` of work ids (skip
+      `id === null`; `null` = opened since the last sync)
+- [x] Find work blurbs on the page: `li.work.blurb`,
+      `li.bookmark.blurb` (id from `/works/<id>` in `h4.heading a`),
+      and work links in general (`a[href^="/works/"]`) for
+      series pages, collections, etc.
+- [x] Also mark the work page itself (`/works/<id>`,
+      `/works/<id>/chapters/<n>`) with a small "read" badge
+- [x] Pure helper `workIdFromHref(href): number | null` + tests
+      (handles `/works/123`, `/works/123/chapters/456`,
+      `/collections/x/works/123`, query strings, anchors)
+
+**Styling**
+
+- [x] Add a class `ao3rs-read` to each matched blurb; green left
+      border + light green background in `src/styles/content.scss`,
+      translucent so it works on AO3's light and dark skins
+- [x] Optional: tooltip/badge with "Read · last visited <date> ·
+      <n> visits" from the stored `Work`
+- [x] Don't touch AO3's own layout: only add a class and a badge,
+      prefix every class with `ao3rs-`
+
+**Keeping it up to date**
+
+- [x] `storage.onChanged` listener: re-mark the page after a sync
+- [x] `MutationObserver` for content AO3 loads later (rare, but cheap)
+- [x] Opening a work adds it to the set right away (optimistic), so
+      it's green on the next listing without needing a sync
+
+**Dashboard link**
+
+- [x] Add a "Reading stats" link to AO3's header nav (next to the
+      user menu)
+- [x] Clicking it sends `runtime.sendMessage({ type: 'open-dashboard' })`;
+      `startBackground` listens and calls `openDashboard` (web pages
+      can't link to `chrome-extension://` URLs directly)
+- [x] When no library is stored yet: the link says "Sync reading stats"
+
+**Settings (dashboard Options menu)**
+
+- [x] Toggle "Highlight read works on AO3" (stored in `storage.local`,
+      content script checks it)
+- [ ] Optional: pick highlight colour; option to hide read works
+      instead of colouring them
+
+**Verify**
+
+- [x] Unit tests for `workIdFromHref` and the blurb marker (jsdom
+      fixture of a search results page)
+- [x] Headless Chromium against a fake AO3 page: read works get the
+      class, others don't; header link opens the dashboard
+- [ ] Manual check on the real site in Chrome and Firefox
+- [x] README: explain the green highlight and the header link
+
 ## Open questions
 
 - AO3 only stores the _last_ visit date and a visit count per work,

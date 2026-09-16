@@ -19,4 +19,19 @@ describe('createManifest', () => {
         });
         expect(manifest).toHaveProperty('browser_specific_settings.gecko.id');
     });
+
+    it.each(['chrome', 'firefox'] as const)(
+        'runs the content script on AO3 in %s',
+        (target) => {
+            const manifest = createManifest(target, '1.2.3');
+            expect(manifest.content_scripts).toEqual([
+                {
+                    matches: ['https://archiveofourown.org/*'],
+                    js: ['content.js'],
+                    css: ['content.css'],
+                    run_at: 'document_idle',
+                },
+            ]);
+        },
+    );
 });

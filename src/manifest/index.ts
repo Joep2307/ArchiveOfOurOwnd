@@ -1,5 +1,7 @@
 export type { BrowserTarget } from './BrowserTarget';
 export {
+    CONTENT_SCRIPT,
+    CONTENT_STYLE,
     EXTENSION_DESCRIPTION,
     EXTENSION_NAME,
     EXTENSION_PAGES_CSP,

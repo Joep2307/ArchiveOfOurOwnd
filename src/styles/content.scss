@@ -1,0 +1,31 @@
+// Injected into AO3 pages. AO3 has its own styles and site skins,
+// so this stays small, uses prefixed classes only, and uses
+// translucent colours that work on light and dark skins.
+@use 'sass:map';
+@use 'abstracts/tokens' as *;
+
+$green: map.get($light, good);
+$green-ink: map.get($light, good-ink);
+
+.ao3rs-read {
+    border-left: 4px solid $green !important;
+    background-color: rgb(12 163 12 / 10%) !important;
+}
+
+.ao3rs-read-link {
+    color: $green-ink !important;
+    text-decoration-color: $green !important;
+}
+
+.ao3rs-badge {
+    display: inline-block;
+    padding: 0 0.45em;
+    border-radius: 999px;
+    background: $green;
+    color: #fff;
+    font-size: 0.7em;
+    font-weight: $weight-bold;
+    line-height: 1.6;
+    vertical-align: middle;
+    cursor: help;
+}

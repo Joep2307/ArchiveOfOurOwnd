@@ -4,7 +4,9 @@ import { filterWorks, type Facet } from '@/stats';
 import {
     clearLibrary,
     loadActiveLibrary,
+    loadHighlightSetting,
     loadLibrary,
+    saveHighlightSetting,
     saveLibrary,
 } from '@/storage';
 import { runSync, SyncError } from '@/sync';
@@ -54,8 +56,12 @@ export function createDashboardController(
 
     return {
         async load() {
-            stored = await loadActiveLibrary(deps.storage);
-            store.update({ library: stored, demo: false });
+            const [library, highlightOnAo3] = await Promise.all([
+                loadActiveLibrary(deps.storage),
+                loadHighlightSetting(deps.storage),
+            ]);
+            stored = library;
+            store.update({ library, demo: false, highlightOnAo3 });
         },
 
         async sync(full) {
@@ -276,6 +282,11 @@ export function createDashboardController(
 
         setTheme(theme) {
             store.update({ theme });
+        },
+
+        async setHighlightOnAo3(highlightOnAo3) {
+            store.update({ highlightOnAo3 });
+            await saveHighlightSetting(deps.storage, highlightOnAo3);
         },
 
         dismissMessage() {

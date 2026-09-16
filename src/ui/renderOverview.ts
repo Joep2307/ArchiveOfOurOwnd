@@ -65,9 +65,10 @@ export function renderOverview(stats: Stats): HTMLElement {
                 `about ${novels} novels`,
             ),
             renderStatTile(
-                'Reading time',
-                formatDuration(totals.readingMinutes),
-                `estimate at ${WORDS_PER_MINUTE} words a minute`,
+                'Estimated reading time',
+                `~${formatDuration(totals.readingMinutes)}`,
+                `based on ${WORDS_PER_MINUTE} words a minute, ` +
+                    'not time tracked',
             ),
             renderStatTile(
                 'Visits',

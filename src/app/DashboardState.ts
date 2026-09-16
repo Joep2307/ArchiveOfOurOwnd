@@ -21,4 +21,6 @@ export type DashboardState = {
     expanded: Record<string, boolean>;
     rankBy: RankMetric;
     theme: 'system' | 'light' | 'dark';
+    /** Highlight read works on archiveofourown.org. */
+    highlightOnAo3: boolean;
 };

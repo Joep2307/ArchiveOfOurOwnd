@@ -12,5 +12,6 @@ export function createInitialState(standalone: boolean): DashboardState {
         expanded: {},
         rankBy: 'works',
         theme: 'system',
+        highlightOnAo3: true,
     };
 }
