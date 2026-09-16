@@ -178,6 +178,16 @@ dashboard.
       Standouts, All works
 - [x] Smoke test opens the Genres and All works pages
 
+### 10. Advanced settings: personal reading speed
+
+- [x] Words per minute saved in storage (clamped 50–1500), used for
+      the estimated reading time
+- [x] Advanced page (`#/settings`, menu + Options) with the speed
+      field and a reset to the 250 average
+- [x] Built-in reading test: timed passage, rejects impossibly fast
+      results, one click to use the measured speed
+- [x] Controller tests; checked in headless Chromium
+
 ## Open questions
 
 - AO3 only stores the _last_ visit date and a visit count per work,

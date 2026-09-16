@@ -280,7 +280,7 @@ describe('feedbackCandidates', () => {
     ): WorkFeedback => ({
         kudos,
         commented,
-        checkedAt: '2026-09-10T08:00:00Z',
+        checkedAt: new Date(2026, 8, 10, 8).toISOString(),
     });
 
     it('picks new, unknown and revisited works', () => {

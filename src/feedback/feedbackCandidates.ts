@@ -1,4 +1,5 @@
 import type { Work, WorkFeedback } from '@/model';
+import { toIsoDate } from '@/parse';
 
 /**
  * Works a scan still has to look at: never checked, not readable last
@@ -22,10 +23,10 @@ export function feedbackCandidates(
         if (previous.kudos === null || previous.commented === null) {
             return true;
         }
-        // Visit dates are whole days, so a same-day visit counts.
+        // Visit dates are whole local days; a same-day visit counts.
         return (
             work.lastVisited !== null &&
-            work.lastVisited >= previous.checkedAt.slice(0, 10)
+            work.lastVisited >= toIsoDate(new Date(previous.checkedAt))
         );
     });
 }

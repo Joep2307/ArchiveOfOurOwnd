@@ -98,12 +98,17 @@ describe('reading speed', () => {
         });
     });
 
-    it('ignores a test finished in a few seconds', async () => {
+    it('ignores a test finished impossibly fast', async () => {
         const { store, controller, clock } = await setup();
         controller.startSpeedTest();
         clock.advance(1_000);
         controller.finishSpeedTest(300);
         expect(store.get().speedTest.result).toBeNull();
+        expect(store.get().speedTest.tooFast).toBe(true);
+
+        controller.startSpeedTest();
+        clock.advance(8_000);
+        controller.finishSpeedTest(300);
         expect(store.get().speedTest.tooFast).toBe(true);
     });
 });

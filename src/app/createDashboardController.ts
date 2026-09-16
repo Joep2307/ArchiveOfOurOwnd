@@ -2,7 +2,12 @@ import { parseLibraryFile, worksToCsv } from '@/export';
 import { feedbackCandidates, runFeedbackScan } from '@/feedback';
 import { plural } from '@/format';
 import { hideRemoved, type Library } from '@/model';
-import { clampWordsPerMinute, filterWorks, type Facet } from '@/stats';
+import {
+    clampWordsPerMinute,
+    filterWorks,
+    MAX_WORDS_PER_MINUTE,
+    type Facet,
+} from '@/stats';
 import {
     clearLibrary,
     loadActiveLibrary,
@@ -584,13 +589,13 @@ export function createDashboardController(
                 return;
             }
             const elapsed = deps.now().getTime() - startedAt;
-            const tooFast = elapsed < MIN_SPEED_TEST_MS;
+            const measured = (words * 60_000) / Math.max(1, elapsed);
+            const tooFast =
+                elapsed < MIN_SPEED_TEST_MS || measured > MAX_WORDS_PER_MINUTE;
             store.update({
                 speedTest: {
                     startedAt: null,
-                    result: tooFast
-                        ? null
-                        : clampWordsPerMinute((words * 60_000) / elapsed),
+                    result: tooFast ? null : clampWordsPerMinute(measured),
                     tooFast,
                 },
             });
