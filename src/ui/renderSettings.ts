@@ -26,6 +26,29 @@ function button(
     });
 }
 
+function formatClock(ms: number): string {
+    const seconds = Math.max(0, Math.floor(ms / 1000));
+    const rest = String(seconds % 60).padStart(2, '0');
+    return `${Math.floor(seconds / 60)}:${rest}`;
+}
+
+/** A clock counting up from `startedAt`; stops once it leaves the page. */
+function renderTimer(startedAt: number): HTMLElement {
+    const timer = el('span', {
+        className: 'settings__timer',
+        text: formatClock(Date.now() - startedAt),
+        attrs: { role: 'timer', 'aria-label': 'Time spent reading' },
+    });
+    const tick = window.setInterval(() => {
+        if (!timer.isConnected) {
+            window.clearInterval(tick);
+            return;
+        }
+        timer.textContent = formatClock(Date.now() - startedAt);
+    }, 250);
+    return timer;
+}
+
 function renderSpeedField(
     state: DashboardState,
     controller: DashboardController,
@@ -99,6 +122,7 @@ function renderSpeedTest(
     let body: (Node | null)[];
     if (reading) {
         body = [
+            renderTimer(startedAt),
             el(
                 'div',
                 {
