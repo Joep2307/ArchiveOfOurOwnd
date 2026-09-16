@@ -20,7 +20,7 @@ describe('refresh reading reviews', () => {
         },
     };
 
-    it('clears not-read for a clearly later visit even without a count change', () => {
+    it('clears not-read for a later visit without a count change', () => {
         expect(
             refreshReadingReviews(base, [
                 { ...original, lastVisited: '2026-09-16' },

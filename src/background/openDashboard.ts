@@ -8,9 +8,6 @@ export async function openDashboard(api: BrowserApi): Promise<void> {
         const [existing] = await api.tabs.query({ url: `${url}*` });
         if (existing?.id !== undefined) {
             await api.tabs.update(existing.id, { active: true });
-            await api.windows.update(existing.windowId, {
-                focused: true,
-            });
             return;
         }
     } catch {
