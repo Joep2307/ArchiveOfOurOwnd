@@ -48,8 +48,11 @@ export type DashboardController = {
     /** Saves the reader's speed; out-of-range values are clamped. */
     setWordsPerMinute: (wordsPerMinute: number) => Promise<void>;
     startSpeedTest: () => void;
-    /** Stops the test and measures the speed over `words` words. */
-    finishSpeedTest: (words: number) => void;
+    /**
+     * Stops the test, measures the speed over `words` words and saves it
+     * as the reader's speed.
+     */
+    finishSpeedTest: (words: number) => Promise<void>;
     resetSpeedTest: () => void;
     dismissMessage: () => void;
 };

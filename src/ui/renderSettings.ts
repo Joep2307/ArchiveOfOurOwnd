@@ -113,7 +113,7 @@ function renderSpeedTest(
                 button(
                     'I’m done reading',
                     () => {
-                        controller.finishSpeedTest(PASSAGE_WORDS);
+                        void controller.finishSpeedTest(PASSAGE_WORDS);
                     },
                     true,
                 ),

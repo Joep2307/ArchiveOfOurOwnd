@@ -86,29 +86,32 @@ describe('reading speed', () => {
         expect(await loadWordsPerMinute(storage)).toBe(312);
     });
 
-    it('measures a speed test', async () => {
-        const { store, controller, clock } = await setup();
+    it('measures a speed test and saves the result', async () => {
+        const { storage, store, controller, clock } = await setup();
         controller.startSpeedTest();
         clock.advance(60_000);
-        controller.finishSpeedTest(300);
+        await controller.finishSpeedTest(300);
         expect(store.get().speedTest).toEqual({
             startedAt: null,
             result: 300,
             tooFast: false,
         });
+        expect(store.get().wordsPerMinute).toBe(300);
+        expect(await loadWordsPerMinute(storage)).toBe(300);
     });
 
     it('ignores a test finished impossibly fast', async () => {
         const { store, controller, clock } = await setup();
         controller.startSpeedTest();
         clock.advance(1_000);
-        controller.finishSpeedTest(300);
+        await controller.finishSpeedTest(300);
         expect(store.get().speedTest.result).toBeNull();
         expect(store.get().speedTest.tooFast).toBe(true);
 
         controller.startSpeedTest();
         clock.advance(8_000);
-        controller.finishSpeedTest(300);
+        await controller.finishSpeedTest(300);
         expect(store.get().speedTest.tooFast).toBe(true);
+        expect(store.get().wordsPerMinute).toBe(250);
     });
 });

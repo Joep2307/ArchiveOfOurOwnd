@@ -74,6 +74,12 @@ export function createDashboardController(
         store.update({ library: shown(stored) });
     };
 
+    const saveSpeed = async (value: number): Promise<void> => {
+        const wordsPerMinute = clampWordsPerMinute(value);
+        store.update({ wordsPerMinute });
+        await saveWordsPerMinute(deps.storage, wordsPerMinute);
+    };
+
     const visibleWorks = (): Library['works'] => {
         const { library, filter } = store.get();
         return library ? filterWorks(library.works, filter, deps.now()) : [];
@@ -566,11 +572,7 @@ export function createDashboardController(
             await saveHighlightSetting(deps.storage, highlightOnAo3);
         },
 
-        async setWordsPerMinute(value) {
-            const wordsPerMinute = clampWordsPerMinute(value);
-            store.update({ wordsPerMinute });
-            await saveWordsPerMinute(deps.storage, wordsPerMinute);
-        },
+        setWordsPerMinute: saveSpeed,
 
         startSpeedTest() {
             store.update({
@@ -582,7 +584,7 @@ export function createDashboardController(
             });
         },
 
-        finishSpeedTest(words) {
+        async finishSpeedTest(words) {
             const { startedAt } = store.get().speedTest;
             if (startedAt === null) {
                 return;
@@ -591,13 +593,13 @@ export function createDashboardController(
             const measured = (words * 60_000) / Math.max(1, elapsed);
             const tooFast =
                 elapsed < MIN_SPEED_TEST_MS || measured > MAX_WORDS_PER_MINUTE;
+            const result = tooFast ? null : clampWordsPerMinute(measured);
             store.update({
-                speedTest: {
-                    startedAt: null,
-                    result: tooFast ? null : clampWordsPerMinute(measured),
-                    tooFast,
-                },
+                speedTest: { startedAt: null, result, tooFast },
             });
+            if (result !== null) {
+                await saveSpeed(result);
+            }
         },
 
         resetSpeedTest() {
