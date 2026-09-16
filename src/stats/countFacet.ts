@@ -9,6 +9,7 @@ export type CountOptions = {
     /** Keep values in `order` even when their count is 0. */
     keepEmpty?: boolean;
     label?: (value: string) => string;
+    wordsRead?: (work: Work) => number;
 };
 
 /**
@@ -45,7 +46,7 @@ export function countFacet(
         for (const value of new Set(facetValues(work, field))) {
             const entry = row(value);
             entry.works += 1;
-            entry.words += work.words;
+            entry.words += options.wordsRead?.(work) ?? work.words;
             entry.visits += work.visits;
         }
     }

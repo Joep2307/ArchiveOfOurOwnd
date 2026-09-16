@@ -3,6 +3,7 @@ import { loadCore } from '../../tests/loadCore';
 import { computeStats } from './computeStats';
 import { emptyFilter } from './emptyFilter';
 import { filterWorks } from './filterWorks';
+import type { ReadingReview } from '@/model/Library';
 
 const core = loadCore();
 const library = createDemoLibrary(300);
@@ -44,6 +45,54 @@ describe('computeStats', () => {
         expect(counts).toEqual([...counts].sort((a, b) => b - a));
         expect(stats.longest[0]?.words).toBe(stats.wordSummary.max);
         expect(stats.shortest[0]?.words).toBe(stats.wordSummary.min);
+    });
+
+    it('applies reviews without rewriting AO3 history', () => {
+        const template = library.works.find((w) => w.kind === 'work');
+        if (!template) throw new Error('Missing fixture work');
+        const works = ['once', 'multiple', 'unread', 'unknown'].map((key) => ({
+            ...template,
+            key,
+            words: 200,
+            visits: 30,
+        }));
+        const reviews: Record<string, ReadingReview> = {
+            once: {
+                status: 'finished',
+                words: 100,
+                readCount: 1,
+                reviewedAt: '2026-09-16',
+            },
+            multiple: {
+                status: 'finished',
+                words: 100,
+                readCount: 3,
+                reviewedAt: '2026-09-16',
+            },
+            unread: { status: 'opened', words: 200, reviewedAt: '2026-09-16' },
+        };
+        const reviewed = computeStats(works, core, reviews);
+        expect(reviewed.totals.works).toBe(3);
+        expect(reviewed.totals.words).toBe(600);
+        expect(reviewed.totals.confirmedWords).toBe(400);
+        expect(reviewed.totals.estimatedWords).toBe(200);
+        expect(reviewed.totals.rereads).toBe(1);
+        expect(reviewed.totals.visits).toBe(120);
+        expect(reviewed.totals.readingMinutes).toBe(2);
+        expect(reviewed.wordSummary.max).toBe(200);
+        expect(reviewed.wordBuckets.reduce((s, b) => s + b.words, 0)).toBe(
+            600,
+        );
+        expect(reviewed.fandoms[0]?.words).toBe(600);
+        expect(reviewed.hiddenGems.map((work) => work.key)).toEqual([
+            'multiple',
+        ]);
+        expect(
+            works.every((work) => work.words === 200 && work.visits === 30),
+        ).toBe(true);
+        const restored = computeStats(works, core);
+        expect(restored.totals.works).toBe(4);
+        expect(restored.totals.words).toBe(800);
     });
 });
 

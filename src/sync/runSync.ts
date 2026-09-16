@@ -6,6 +6,7 @@ import type { FetchText } from './FetchText';
 import { fetchWithRetry } from './fetchWithRetry';
 import { isPageUnchanged } from './isPageUnchanged';
 import { mergeWorks } from './mergeWorks';
+import { refreshReadingReviews } from './refreshReadingReviews';
 import { readingsUrl } from './readingsUrl';
 import type { Sleep } from './Sleep';
 import { SyncError } from './SyncError';
@@ -98,6 +99,9 @@ export async function runSync(options: SyncOptions): Promise<Library> {
 
     const snapshot = (complete: boolean): Library => ({
         ...base,
+        ...(base.reviews
+            ? { reviews: refreshReadingReviews(base, fresh) }
+            : {}),
         syncedAt: complete ? now().toISOString() : base.syncedAt,
         works:
             complete && !incremental

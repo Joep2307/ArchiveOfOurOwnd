@@ -2,6 +2,7 @@ import { parseLibraryFile, worksToCsv } from '@/export';
 import { plural } from '@/format';
 import { hideRemoved, type Library } from '@/model';
 import { filterWorks, type Facet } from '@/stats';
+import { reviewCandidates } from '@/stats/reviewCandidates';
 import {
     clearLibrary,
     loadActiveLibrary,
@@ -214,11 +215,9 @@ export function createDashboardController(
                     },
                 });
                 store.update({
-                    reviewOpen: Boolean(
-                        shown(library)?.works.some(
-                            (work) => work.kind === 'work',
-                        ),
-                    ),
+                    reviewOpen: reviewCandidates(
+                        shown(library)?.works ?? [],
+                    ).some((work) => !library.reviews?.[work.key]),
                 });
                 const added = library.works.length - before;
                 setSync({

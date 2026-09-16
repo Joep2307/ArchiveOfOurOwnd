@@ -49,6 +49,15 @@ export function renderOverview(stats: Stats): HTMLElement {
             attrs: { id: 'overview-h' },
         }),
         el('p', { className: 'section__lead', text: range + busiest }),
+        el('p', {
+            className: 'section__lead',
+            text:
+                `${formatNumber(totals.confirmedWords)} confirmed words + ` +
+                `${formatNumber(totals.estimatedWords)} estimated words. ` +
+                'Reviews update these stats. Not-read works are excluded; ' +
+                'unreviewed and uncertain works remain estimates. ' +
+                'All works and AO3 visits retain your imported history.',
+        }),
         el(
             'div',
             { className: 'tiles' },
@@ -71,7 +80,7 @@ export function renderOverview(stats: Stats): HTMLElement {
                     'not time tracked',
             ),
             renderStatTile(
-                'Visits',
+                'AO3 visits',
                 formatNumber(totals.visits),
                 `${visitSummary.mean.toFixed(1)} per work on average`,
             ),
@@ -86,10 +95,9 @@ export function renderOverview(stats: Stats): HTMLElement {
                 `${formatNumber(totals.inProgress)} works in progress`,
             ),
             renderStatTile(
-                'Re-read',
+                'Confirmed re-reads',
                 formatNumber(totals.rereads),
-                `${percent(totals.rereads, totals.entries)} opened ` +
-                    'more than once',
+                'works you confirmed reading more than once',
             ),
             renderStatTile(
                 'Authors',

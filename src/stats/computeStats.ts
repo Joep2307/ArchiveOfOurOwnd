@@ -1,4 +1,5 @@
 import type { Work } from '@/model';
+import type { ReadingReview } from '@/model/Library';
 import { RATINGS } from '@/model';
 import { buildTimeline } from './buildTimeline';
 import {
@@ -26,6 +27,7 @@ function dateRange(works: readonly Work[]): [string | null, string | null] {
 function wordBuckets(
     readable: readonly Work[],
     core: StatsCore,
+    wordsRead: (work: Work) => number,
 ): CountEntry[] {
     const counts = core.histogram(
         readable.map((work) => work.words),
@@ -37,7 +39,7 @@ function wordBuckets(
         const index = WORD_BUCKET_EDGES.findLastIndex(
             (edge) => work.words >= edge,
         );
-        words[index] = (words[index] ?? 0) + work.words;
+        words[index] = (words[index] ?? 0) + wordsRead(work);
         visits[index] = (visits[index] ?? 0) + work.visits;
     }
     return WORD_BUCKET_LABELS.map((label, index) => ({
@@ -55,20 +57,50 @@ function sortByValue(entries: CountEntry[]): CountEntry[] {
 }
 
 /** Computes every statistic for a list of works. */
-export function computeStats(works: readonly Work[], core: StatsCore): Stats {
+export function computeStats(
+    imported: readonly Work[],
+    core: StatsCore,
+    reviews: Record<string, ReadingReview> = {},
+): Stats {
+    // Preserve raw AO3 records; apply review snapshots only to statistics.
+    const works = imported
+        .filter((work) => reviews[work.key]?.status !== 'opened')
+        .map((work) => {
+            const review = reviews[work.key];
+            return review?.status === 'finished'
+                ? { ...work, words: review.words }
+                : work;
+        });
+    const wordsRead = (work: Work): number => {
+        const review = reviews[work.key];
+        return (
+            work.words *
+            (review?.status === 'finished' ? (review.readCount ?? 1) : 1)
+        );
+    };
+    const isReread = (work: Work): boolean => {
+        const review = reviews[work.key];
+        return review?.status === 'finished' && (review.readCount ?? 1) > 1;
+    };
     const readable = works.filter((work) => work.kind === 'work');
     const timeline = buildTimeline(works);
     const [firstVisited, lastVisited] = dateRange(works);
 
-    const authors = countFacet(readable, 'author');
-    const fandoms = countFacet(readable, 'fandom');
-    const relationships = countFacet(readable, 'relationship');
-    const characters = countFacet(readable, 'character');
-    const freeforms = countFacet(readable, 'freeform');
-    const series = countFacet(readable, 'series');
-    const languages = countFacet(readable, 'language');
+    const authors = countFacet(readable, 'author', { wordsRead });
+    const fandoms = countFacet(readable, 'fandom', { wordsRead });
+    const relationships = countFacet(readable, 'relationship', { wordsRead });
+    const characters = countFacet(readable, 'character', { wordsRead });
+    const freeforms = countFacet(readable, 'freeform', { wordsRead });
+    const series = countFacet(readable, 'series', { wordsRead });
+    const languages = countFacet(readable, 'language', { wordsRead });
 
-    const words = readable.reduce((sum, work) => sum + work.words, 0);
+    const words = readable.reduce((sum, work) => sum + wordsRead(work), 0);
+    const confirmedWords = readable.reduce(
+        (sum, work) =>
+            sum +
+            (reviews[work.key]?.status === 'finished' ? wordsRead(work) : 0),
+        0,
+    );
     const complete = readable.filter((work) => work.complete).length;
 
     const busiestMonth = timeline.reduce<Stats['busiestMonth']>(
@@ -84,7 +116,9 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
             deleted: works.filter((w) => w.kind === 'deleted').length,
             mystery: works.filter((w) => w.kind === 'mystery').length,
             words,
-            visits: works.reduce((sum, work) => sum + work.visits, 0),
+            confirmedWords,
+            estimatedWords: words - confirmedWords,
+            visits: imported.reduce((sum, work) => sum + work.visits, 0),
             authors: authors.filter((a) => a.value !== 'Anonymous').length,
             fandoms: fandoms.length,
             relationships: relationships.length,
@@ -92,7 +126,7 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
             tags: freeforms.length,
             series: series.length,
             languages: languages.length,
-            rereads: works.filter((work) => work.visits > 1).length,
+            rereads: readable.filter(isReread).length,
             complete,
             inProgress: readable.length - complete,
             updatesAvailable: readable.filter((w) => w.updateAvailable).length,
@@ -107,21 +141,24 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
             lastVisited,
         },
         wordSummary: core.summarize(readable.map((work) => work.words)),
-        visitSummary: core.summarize(works.map((work) => work.visits)),
+        visitSummary: core.summarize(imported.map((work) => work.visits)),
         kudosSummary: core.summarize(readable.map((work) => work.kudos)),
         chapterSummary: core.summarize(
             readable.map((work) => work.chaptersPosted),
         ),
         timeline,
         visitedYears: sortByValue(countFacet(works, 'visitedYear')),
-        updatedYears: sortByValue(countFacet(readable, 'updatedYear')),
-        ratings: countFacet(readable, 'rating', { order: RATINGS }),
-        categories: countFacet(readable, 'category'),
-        warnings: countFacet(readable, 'warning'),
-        wordBuckets: wordBuckets(readable, core),
+        updatedYears: sortByValue(
+            countFacet(readable, 'updatedYear', { wordsRead }),
+        ),
+        ratings: countFacet(readable, 'rating', { order: RATINGS, wordsRead }),
+        categories: countFacet(readable, 'category', { wordsRead }),
+        warnings: countFacet(readable, 'warning', { wordsRead }),
+        wordBuckets: wordBuckets(readable, core, wordsRead),
         status: countFacet(readable, 'status', {
             order: ['Complete', 'In progress'],
             keepEmpty: true,
+            wordsRead,
         }),
         languages,
         authors,
@@ -135,7 +172,7 @@ export function computeStats(works: readonly Work[], core: StatsCore): Stats {
         shortest: topWorks(readable, (w) => -w.words, TOP_WORKS),
         mostKudos: topWorks(readable, (w) => w.kudos, TOP_WORKS),
         hiddenGems: topWorks(
-            readable.filter((w) => w.visits > 1),
+            readable.filter(isReread),
             (w) => -w.kudos,
             TOP_WORKS,
         ),

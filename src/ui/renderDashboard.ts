@@ -1,5 +1,6 @@
 import type { DashboardController, DashboardState } from '@/app';
 import type { Work } from '@/model';
+import type { Library } from '@/model';
 import type { Stats, StatsCore } from '@/stats';
 import { computeStats, filterWorks } from '@/stats';
 import { el } from './el';
@@ -25,6 +26,7 @@ export type DashboardParts = {
 };
 
 type Cache = {
+    reviews: Library['reviews'];
     works: readonly Work[] | null;
     filter: DashboardState['filter'] | null;
     matching: Work[];
@@ -39,6 +41,7 @@ export function createDashboardRenderer(
     now: () => Date,
 ): (state: DashboardState) => void {
     const cache: Cache = {
+        reviews: undefined,
         works: null,
         filter: null,
         matching: [],
@@ -50,12 +53,14 @@ export function createDashboardRenderer(
         if (
             cache.stats === null ||
             cache.works !== works ||
+            cache.reviews !== state.library?.reviews ||
             cache.filter !== state.filter
         ) {
             cache.works = works;
+            cache.reviews = state.library?.reviews;
             cache.filter = state.filter;
             cache.matching = filterWorks(works, state.filter, now());
-            cache.stats = computeStats(cache.matching, core);
+            cache.stats = computeStats(cache.matching, core, cache.reviews);
         }
         return [cache.matching, cache.stats];
     };

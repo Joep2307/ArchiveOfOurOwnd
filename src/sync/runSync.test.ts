@@ -3,6 +3,8 @@ import { parseHtml } from '@/parse';
 import type { FetchText } from './FetchText';
 import { runSync } from './runSync';
 import { SyncError } from './SyncError';
+import { computeStats } from '@/stats';
+import { loadCore } from '../../tests/loadCore';
 
 const NOW = new Date(2026, 8, 16);
 
@@ -124,6 +126,45 @@ describe('runSync', () => {
         await runSync({ ...options, full: true });
         expect(requested).toHaveLength(4);
     });
+
+    it.each([false, true])(
+        'restores later visits (full sync: %s)',
+        async (full) => {
+            const first = await runSync(setup(PAGES, null).options);
+            const work = first.works[0];
+            if (!work) throw new Error('Missing fixture work');
+            first.reviews = {
+                [work.key]: {
+                    status: 'opened',
+                    words: work.words,
+                    reviewedAt: NOW.toISOString(),
+                },
+            };
+            const core = loadCore();
+            const before = computeStats(first.works, core, first.reviews);
+            const unchanged = await runSync({
+                ...setup(PAGES, first).options,
+                full,
+            });
+            expect(unchanged.reviews?.[work.key]?.status).toBe('opened');
+            const changed = PAGES.map((entries) =>
+                entries.map((entry) =>
+                    entry.id === work.id
+                        ? { ...entry, visits: entry.visits + 1 }
+                        : entry,
+                ),
+            );
+            const after = await runSync({
+                ...setup(changed, unchanged).options,
+                full,
+            });
+            expect(after.reviews?.[work.key]).toBeUndefined();
+            const stats = computeStats(after.works, core, after.reviews);
+            expect(stats.totals.works).toBe(before.totals.works + 1);
+            expect(stats.totals.words).toBe(before.totals.words + work.words);
+            expect(stats.totals.confirmedWords).toBe(0);
+        },
+    );
 
     it('fails clearly when logged out', async () => {
         const { options } = setup(PAGES, null);

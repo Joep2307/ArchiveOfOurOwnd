@@ -62,7 +62,8 @@ export function renderTimeline(context: ViewContext): HTMLElement {
                 subtitle:
                     'Grouped by the date you last opened each work. ' +
                     'AO3 only keeps your most recent visit, so ' +
-                    're-reads count once, in their latest month.',
+                    'each work and its length count once here. ' +
+                    'Individual reread dates are unknown.',
                 className: 'panel--full',
                 actions: renderToggle(
                     'Group by',
