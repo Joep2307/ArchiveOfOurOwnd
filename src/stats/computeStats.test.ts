@@ -47,6 +47,41 @@ describe('computeStats', () => {
         expect(stats.shortest[0]?.words).toBe(stats.wordSummary.min);
     });
 
+    it('ranks corrected counts before choosing the most visited works', () => {
+        const template = library.works.find((w) => w.kind === 'work');
+        if (!template) throw new Error('Missing fixture work');
+        const works = Array.from({ length: 15 }, (_, index) => ({
+            ...template,
+            key: String(index),
+            title: `Work ${index}`,
+            visits: 100 - index,
+        }));
+        const reviews: Record<string, ReadingReview> = {
+            '0': {
+                status: 'finished',
+                readCount: 1,
+                words: 100,
+                reviewedAt: '2026-09-17',
+            },
+            '14': {
+                status: 'finished',
+                readCount: 120,
+                words: 100,
+                reviewedAt: '2026-09-17',
+            },
+        };
+        const ranked = computeStats(works, core, reviews).mostVisited;
+        expect(ranked[0]?.key).toBe('14');
+        expect(ranked[1]?.key).toBe('1');
+        expect(ranked.some((work) => work.key === '0')).toBe(false);
+        const counts = ranked.map(
+            (work) => reviews[work.key]?.readCount ?? work.visits,
+        );
+        expect(counts).toEqual([...counts].sort((a, b) => b - a));
+        expect(computeStats(works, core).mostVisited[0]?.key).toBe('0');
+        expect(works[0]?.visits).toBe(100);
+    });
+
     it('applies reviews without rewriting AO3 history', () => {
         const template = library.works.find((w) => w.kind === 'work');
         if (!template) throw new Error('Missing fixture work');
@@ -77,7 +112,7 @@ describe('computeStats', () => {
         expect(reviewed.totals.confirmedWords).toBe(400);
         expect(reviewed.totals.estimatedWords).toBe(200);
         expect(reviewed.totals.rereads).toBe(1);
-        expect(reviewed.totals.visits).toBe(120);
+        expect(reviewed.totals.visits).toBe(64);
         expect(reviewed.totals.readingMinutes).toBe(2);
         expect(reviewed.wordSummary.max).toBe(200);
         expect(reviewed.wordBuckets.reduce((s, b) => s + b.words, 0)).toBe(

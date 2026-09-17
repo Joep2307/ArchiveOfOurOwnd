@@ -5,6 +5,8 @@ import type { FetchText, Sleep } from '@/sync';
 
 /** Everything the controller needs from the outside world. */
 export type DashboardDeps = {
+    connectAccount?: () => Promise<boolean>;
+    disconnectAccount?: () => void;
     storage: StorageArea;
     core: StatsCore;
     fetchText: FetchText;

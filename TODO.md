@@ -198,9 +198,8 @@ dashboard.
 
 ## Out of scope
 
-- Testing in a real Firefox and against the live AO3 site (do this
-  on your own machine, see README)
+Live AO3 verification and publishing are now tracked in `TODO/` (items 2
+and 4), alongside the other requested follow-up work.
 
 - "Marked for Later" list (easy follow-up: same parser, `show=to-read`)
-- Publishing to the Chrome Web Store / Firefox Add-ons
 - Syncing between devices

@@ -6,11 +6,15 @@ export function renderWelcome(
     state: DashboardState,
     controller: DashboardController,
 ): HTMLElement {
+    const needsConnection = state.standalone && !state.accountConnected;
     const steps = [
         'Make sure you are logged in to archiveofourown.org in this ' +
             'browser and that History is turned on in your AO3 ' +
             'preferences.',
-        'Press “Sync my history”. The extension reads your History ' +
+        (needsConnection
+            ? 'Press “Connect AO3 account”. '
+            : 'Press “Sync my history”. ') +
+            'The extension reads your History ' +
             'pages one by one, with a pause between pages so AO3 is ' +
             'not overloaded. Large histories take a few minutes.',
         'Explore. Everything is stored only in this browser. Next ' +
@@ -38,9 +42,9 @@ export function renderWelcome(
             ? el('p', {
                   className: 'banner banner--info',
                   text:
-                      'This is the local preview. Syncing only works ' +
-                      'when the page runs inside the installed ' +
-                      'extension.',
+                      'Connect your AO3 account to load your history ' +
+                      'using the installed Reading Stats extension. ' +
+                      'You can return to demo data at any time.',
               })
             : null,
         el(
@@ -48,12 +52,19 @@ export function renderWelcome(
             { className: 'welcome__actions' },
             el('button', {
                 className: 'button button--primary button--large',
-                text: 'Sync my history',
+                text: needsConnection
+                    ? 'Connect AO3 account'
+                    : 'Sync my history',
                 attrs: {
                     type: 'button',
-                    disabled: state.standalone || state.sync.running,
+                    disabled: state.sync.running,
                 },
-                on: { click: () => void controller.sync(false) },
+                on: {
+                    click: () => {
+                        if (needsConnection) void controller.connectAo3();
+                        else void controller.sync(false);
+                    },
+                },
             }),
             el('button', {
                 className: 'button button--large',

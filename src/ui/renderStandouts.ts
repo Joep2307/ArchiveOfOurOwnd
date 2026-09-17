@@ -5,8 +5,9 @@ import { renderSection } from './renderSection';
 import { renderToggle } from './renderToggle';
 import { renderWorkList } from './renderWorkList';
 import type { ViewContext } from './ViewContext';
+import { el } from './el';
 
-/** Most revisited, longest or shortest, most loved and hidden gems. */
+/** Most visited, longest or shortest, most loved and hidden gems. */
 export function renderStandouts(context: ViewContext): HTMLElement {
     const { state, stats, controller } = context;
     const shortest = state.lengthOrder === 'shortest';
@@ -14,11 +15,33 @@ export function renderStandouts(context: ViewContext): HTMLElement {
         'standouts',
         'Standouts',
         renderPanel(
-            { title: 'Most revisited', subtitle: 'Your comfort reads.' },
+            {
+                title: 'Most visited',
+                subtitle: 'Your comfort reads.',
+                actions: el('button', {
+                    className: 'button button--ghost',
+                    text: 'Review these works',
+                    attrs: { type: 'button' },
+                    on: {
+                        click: () => {
+                            controller.setReviewOpen(true);
+                        },
+                    },
+                }),
+            },
             renderWorkList(
                 stats.mostVisited,
-                (work) => plural(work.visits, 'visit'),
+                (work) =>
+                    plural(
+                        state.library?.reviews?.[work.key]?.status ===
+                            'finished'
+                            ? (state.library.reviews[work.key]?.readCount ?? 1)
+                            : work.visits,
+                        'visit',
+                    ),
                 'Nothing yet.',
+                state,
+                controller,
             ),
         ),
         renderPanel(
@@ -41,6 +64,8 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 shortest ? stats.shortest : stats.longest,
                 (work) => `${formatNumber(work.words)} words`,
                 'Nothing yet.',
+                state,
+                controller,
             ),
         ),
         renderPanel(
@@ -49,6 +74,8 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 stats.mostKudos,
                 (work) => plural(work.kudos, 'kudo'),
                 'Nothing yet.',
+                state,
+                controller,
             ),
         ),
         renderPanel(
@@ -60,8 +87,16 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 stats.hiddenGems,
                 (work) =>
                     `${plural(work.kudos, 'kudo')} · ` +
-                    plural(work.visits, 'visit'),
+                    plural(
+                        state.library?.reviews?.[work.key]?.status ===
+                            'finished'
+                            ? (state.library.reviews[work.key]?.readCount ?? 1)
+                            : work.visits,
+                        'visit',
+                    ),
                 'Re-read a work to see it here.',
+                state,
+                controller,
             ),
         ),
     );

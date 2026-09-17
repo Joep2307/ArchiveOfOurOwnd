@@ -54,11 +54,20 @@ export function renderHighlights(context: ViewContext): HTMLElement {
             top(stats.fandoms, 'Top fandoms'),
         ),
         renderPanel(
-            { title: 'Most revisited', actions: seeMore('standouts') },
+            { title: 'Most visited', actions: seeMore('standouts') },
             renderWorkList(
                 stats.mostVisited.slice(0, HIGHLIGHT_ROWS),
-                (work) => plural(work.visits, 'visit'),
+                (work) => {
+                    const review = state.library?.reviews?.[work.key];
+                    const visits =
+                        review?.status === 'finished'
+                            ? (review.readCount ?? 1)
+                            : work.visits;
+                    return plural(visits, 'visit');
+                },
                 'Nothing yet.',
+                state,
+                controller,
             ),
         ),
     );

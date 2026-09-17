@@ -5,6 +5,8 @@ import type { LengthOrder } from './LengthOrder';
 import type { SortKey } from './SortKey';
 
 export type DashboardController = {
+    connectAo3: () => Promise<void>;
+    disconnectAo3: () => void;
     setReviewOpen: (open: boolean) => void;
     reviewWork: (
         key: string,

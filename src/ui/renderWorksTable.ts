@@ -7,6 +7,7 @@ import { renderEmpty } from './renderEmpty';
 import { renderPanel } from './renderPanel';
 import { renderSection } from './renderSection';
 import { renderWorkTitle } from './renderWorkTitle';
+import { reviewControl } from './renderWorkList';
 import type { ViewContext } from './ViewContext';
 
 const PAGE_SIZE = 50;
@@ -82,12 +83,29 @@ const COLUMNS: Column[] = [
         key: 'visits',
         label: 'Visits',
         numeric: true,
-        cell: (work) => formatNumber(work.visits),
+        cell: (work, { state }) => {
+            const review = state.library?.reviews?.[work.key];
+            const visits =
+                review?.status === 'finished'
+                    ? (review.readCount ?? 1)
+                    : work.visits;
+            return formatNumber(visits);
+        },
     },
     {
         key: 'lastVisited',
         label: 'Last visited',
         cell: (work) => formatDate(work.lastVisited),
+    },
+    {
+        key: null,
+        label: 'Review',
+        hiddenLabel: true,
+        className: 'is-action',
+        cell: (work, { state, controller }) =>
+            work.kind === 'work'
+                ? reviewControl(work, state, controller)
+                : '—',
     },
     {
         key: null,

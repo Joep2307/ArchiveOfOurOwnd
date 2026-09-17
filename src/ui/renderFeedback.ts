@@ -17,7 +17,10 @@ export function renderFeedback(
 ): HTMLElement {
     const totals = countFeedback(works, state.library?.feedback ?? {});
     const checked = totals.checked > 0;
-    const canCheck = !state.sync.running && !state.demo && !state.standalone;
+    const canCheck =
+        !state.sync.running &&
+        !state.demo &&
+        (!state.standalone || state.accountConnected);
 
     const lead = !checked
         ? 'AO3 doesn’t list the works you gave kudos or commented on, ' +

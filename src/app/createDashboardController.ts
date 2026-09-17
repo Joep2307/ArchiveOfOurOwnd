@@ -85,7 +85,35 @@ export function createDashboardController(
         return library ? filterWorks(library.works, filter, deps.now()) : [];
     };
 
+    let connecting = false;
     return {
+        async connectAo3() {
+            if (store.get().sync.running || connecting) return;
+            connecting = true;
+            try {
+                if (await deps.connectAccount?.()) {
+                    store.update({ accountConnected: true });
+                    // A newly connected website may have a partial cache from
+                    // an interrupted run. Rebuild it completely once.
+                    await this.sync(true);
+                }
+            } catch (error) {
+                setSync({
+                    error: {
+                        code: 'unknown',
+                        message:
+                            error instanceof Error
+                                ? error.message
+                                : 'Could not connect to AO3.',
+                    },
+                });
+            } finally {
+                connecting = false;
+            }
+        },
+        disconnectAo3() {
+            deps.disconnectAccount?.();
+        },
         setReviewOpen(reviewOpen) {
             store.update({
                 reviewOpen,

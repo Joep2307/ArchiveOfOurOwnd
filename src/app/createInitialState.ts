@@ -6,6 +6,7 @@ export function createInitialState(standalone: boolean): DashboardState {
         library: undefined,
         view: 'dashboard',
         demo: false,
+        accountConnected: false,
         reviewOpen: false,
         reviewSessionAnswered: [],
         standalone,

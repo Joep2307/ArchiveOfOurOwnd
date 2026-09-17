@@ -144,7 +144,12 @@ export function renderReadingReview({
                 className: 'muted',
                 text:
                     `${formatNumber(work.words)} words · ` +
-                    plural(work.visits, 'AO3 visit'),
+                    plural(
+                        review?.status === 'finished'
+                            ? (review.readCount ?? 1)
+                            : work.visits,
+                        'read',
+                    ),
             }),
             el(
                 'details',

@@ -1,4 +1,5 @@
 import type { BrowserTarget } from './BrowserTarget';
+import { DASHBOARD_ORIGINS } from '../connection/protocol';
 import {
     CONTENT_SCRIPT,
     CONTENT_STYLE,
@@ -44,6 +45,14 @@ export function createManifest(
                 matches: [HOST_PERMISSION],
                 js: [CONTENT_SCRIPT],
                 css: [CONTENT_STYLE],
+                run_at: 'document_idle',
+            },
+            {
+                matches: DASHBOARD_ORIGINS.map((origin) => {
+                    const url = new URL(origin);
+                    return `${url.protocol}//${url.hostname}/*`;
+                }),
+                js: [CONTENT_SCRIPT],
                 run_at: 'document_idle',
             },
         ],

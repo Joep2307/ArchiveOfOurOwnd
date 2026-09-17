@@ -37,6 +37,7 @@ export function renderHeader(
     now: Date,
 ): HTMLElement {
     const { library, sync, demo, standalone } = state;
+    const cannotSync = standalone && !state.accountConnected;
     const hasData = Boolean(library);
     const removedCount = library?.removed?.length ?? 0;
 
@@ -107,7 +108,7 @@ export function renderHeader(
             'ul',
             { className: 'menu__list', attrs: { role: 'menu' } },
             menuItem('Full re-sync', () => void controller.sync(true), {
-                disabled: sync.running || standalone,
+                disabled: sync.running || cannotSync,
             }),
             menuItem(
                 'Review reading history',
@@ -123,7 +124,7 @@ export function renderHeader(
             menuItem(
                 'Check kudos and comments',
                 () => void controller.checkFeedback(),
-                { disabled: sync.running || standalone || demo || !hasData },
+                { disabled: sync.running || cannotSync || demo || !hasData },
             ),
             menuItem('Export JSON (backup)', controller.exportJson, {
                 disabled: !hasData,
@@ -175,7 +176,7 @@ export function renderHeader(
         : el('button', {
               className: 'button button--primary',
               text: library && !demo ? 'Sync now' : 'Sync my history',
-              attrs: { type: 'button', disabled: standalone },
+              attrs: { type: 'button', disabled: cannotSync },
               on: { click: () => void controller.sync(false) },
           });
 
@@ -210,6 +211,23 @@ export function renderHeader(
                 'div',
                 { className: 'header__actions' },
                 account,
+                standalone && state.accountConnected
+                    ? el('button', {
+                          className: 'button button--ghost',
+                          text: 'Disconnect and return to start',
+                          attrs: { type: 'button', disabled: sync.running },
+                          on: { click: controller.disconnectAo3 },
+                      })
+                    : null,
+                el('button', {
+                    className: 'button',
+                    text: 'Connect AO3 account',
+                    attrs: {
+                        type: 'button',
+                        disabled: sync.running,
+                    },
+                    on: { click: () => void controller.connectAo3() },
+                }),
                 syncButton,
                 menu,
             ),

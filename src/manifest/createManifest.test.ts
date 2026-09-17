@@ -24,14 +24,16 @@ describe('createManifest', () => {
         'runs the content script on AO3 in %s',
         (target) => {
             const manifest = createManifest(target, '1.2.3');
-            expect(manifest.content_scripts).toEqual([
-                {
-                    matches: ['https://archiveofourown.org/*'],
-                    js: ['content.js'],
-                    css: ['content.css'],
-                    run_at: 'document_idle',
-                },
-            ]);
+            expect(manifest.content_scripts).toEqual(
+                expect.arrayContaining([
+                    {
+                        matches: ['https://archiveofourown.org/*'],
+                        js: ['content.js'],
+                        css: ['content.css'],
+                        run_at: 'document_idle',
+                    },
+                ]),
+            );
         },
     );
 });

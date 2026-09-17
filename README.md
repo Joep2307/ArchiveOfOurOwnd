@@ -78,6 +78,39 @@ data, theme, highlighting on AO3, and delete the stored history.
 
 ## Working on the code
 
+### Optional AO3 account in the website demo
+
+The website opens with “See everything you have read on AO3” until you connect.
+Choose **Preview with demo data** to explore with fictional history.
+To test with your own account:
+
+1. Rebuild (`pnpm build:ext`) and load or reload `dist/chrome` or
+   `dist/firefox` as an extension in the same browser as the demo.
+2. Refresh `http://127.0.0.1:5173/dashboard.html` (or localhost:5173).
+3. Select **Connect AO3 account** and allow this dashboard to read your history.
+4. Open AO3 login from the dialog, sign in on AO3, then return and select
+   **I’m logged in — load my history**. History must be enabled on AO3.
+   The first connection performs a full history sync; later refreshes are
+   incremental.
+5. Refresh or return later: your connection and saved history are restored.
+   Use **Disconnect and return to start** to stop remembering the connection.
+
+Website account data is saved locally in the extension, separately for each
+website origin and separately from the extension dashboard’s own history.
+Refreshing restores the saved account even if the URL still contains `?demo`,
+then checks for updates with an incremental sync. AO3 may eventually expire
+its own login; saved history remains visible while you sign in again.
+Disconnecting revokes website access and returns to the welcome page. It keeps the
+local cache for your next connection and does not log you out of AO3 itself.
+Use **Delete stored history** while connected to remove that account’s cache.
+
+For publication, add the website’s exact HTTPS origin to `DASHBOARD_ORIGINS`
+in `src/connection/protocol.ts`, rebuild and distribute the extension, and
+serve the dashboard at that origin. The same connection flow then works there.
+Only the localhost origins are currently enabled. Visitors need the extension
+to connect; the public demo works without it. No AO3 password or session cookie
+is passed to the website. This does not provide extension-free website login.
+
 You need [Node.js 22+](https://nodejs.org) and pnpm. Step by step, in
 Terminal, from this folder:
 
@@ -87,8 +120,8 @@ Terminal, from this folder:
 4. Or rebuild automatically on every save: `pnpm dev`
    (then press the reload ↻ button on `chrome://extensions`)
 5. Design without the extension, with demo data, in a normal tab:
-   `pnpm preview`, then open `http://127.0.0.1:5173/dashboard.html?demo`
-   yourself. It updates the same dashboard as you edit the source files.
+   `pnpm preview`, then open `http://127.0.0.1:5173/dashboard.html`
+   and choose **Preview with demo data**. It updates as you edit the source.
    The command never opens browser windows, and refuses to start another
    server if port 5173 is already in use.
 6. Run the checks: `pnpm typecheck`, `pnpm lint`, `pnpm test`

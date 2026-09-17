@@ -9,8 +9,9 @@ import { loadCore } from '../../tests/loadCore';
 import { createDashboardController } from './createDashboardController';
 import { createInitialState } from './createInitialState';
 import { createStore } from './createStore';
+import type { DashboardDeps } from './DashboardDeps';
 
-async function setup() {
+async function setup(overrides: Partial<DashboardDeps> = {}) {
     const storage = createMemoryStorage();
     const library = createDemoLibrary(10);
     await saveLibrary(storage, library);
@@ -33,10 +34,47 @@ async function setup() {
         confirm: () => true,
         now: () => new Date(time),
         createDemo: () => createDemoLibrary(10),
+        ...overrides,
     });
     await controller.load();
     return { storage, library, store, controller, clock };
 }
+
+describe('connecting from the demo', () => {
+    it('keeps demo data until the user finishes connecting', async () => {
+        const { controller, store } = await setup({
+            connectAccount: () => Promise.resolve(false),
+        });
+        controller.showDemo();
+        const demo = store.get().library;
+        await controller.connectAo3();
+        expect(store.get().library).toBe(demo);
+        expect(store.get().accountConnected).toBe(false);
+    });
+
+    it('enables connected sync in the standalone dashboard', async () => {
+        const { controller, store } = await setup({
+            connectAccount: () => Promise.resolve(true),
+        });
+        controller.showDemo();
+        const sync = vi.spyOn(controller, 'sync').mockResolvedValue();
+        await controller.connectAo3();
+        expect(store.get().accountConnected).toBe(true);
+        expect(store.get().standalone).toBe(true);
+        expect(sync).toHaveBeenCalledWith(true);
+    });
+
+    it('keeps the demo when the extension is unavailable', async () => {
+        const { controller, store } = await setup({
+            connectAccount: () =>
+                Promise.reject(new Error('Install the extension')),
+        });
+        controller.showDemo();
+        await controller.connectAo3();
+        expect(store.get().demo).toBe(true);
+        expect(store.get().sync.error?.message).toBe('Install the extension');
+    });
+});
 
 describe('removing works', () => {
     it('hides a work and remembers it in storage', async () => {

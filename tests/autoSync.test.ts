@@ -59,12 +59,30 @@ describe('dashboard startup sync', () => {
         },
     );
 
-    it('does not sync a standalone preview', async () => {
-        const { storage, fetchText, root } = setup(false);
-        await bootDashboard(root, {
-            core: loadCore(),
-            deps: { storage, fetchText },
-        });
-        expect(fetchText).not.toHaveBeenCalled();
-    });
+    it.each(['/', '/dashboard.html?demo'])(
+        'starts at welcome on the website: %s',
+        async (url) => {
+            window.history.replaceState({}, '', url);
+            const { storage, fetchText, root } = setup(false);
+            await bootDashboard(root, {
+                core: loadCore(),
+                deps: { storage, fetchText },
+            });
+            expect(fetchText).not.toHaveBeenCalled();
+            await vi.waitFor(() => {
+                expect(root.textContent).toContain(
+                    'See everything you have read on AO3',
+                );
+            });
+            expect(root.textContent).toContain('Connect AO3 account');
+            const actions = root.querySelectorAll<HTMLButtonElement>(
+                '.welcome__actions button',
+            );
+            expect(actions[0]?.disabled).toBe(false);
+            actions[1]?.click();
+            await vi.waitFor(() => {
+                expect(root.textContent).toContain('Demo data');
+            });
+        },
+    );
 });

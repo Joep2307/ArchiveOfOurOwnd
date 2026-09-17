@@ -82,6 +82,12 @@ export function computeStats(
         const review = reviews[work.key];
         return review?.status === 'finished' && (review.readCount ?? 1) > 1;
     };
+    const effectiveVisits = (work: Work): number => {
+        const review = reviews[work.key];
+        return review?.status === 'finished'
+            ? (review.readCount ?? 1)
+            : work.visits;
+    };
     const readable = works.filter((work) => work.kind === 'work');
     const timeline = buildTimeline(works);
     const [firstVisited, lastVisited] = dateRange(works);
@@ -118,7 +124,10 @@ export function computeStats(
             words,
             confirmedWords,
             estimatedWords: words - confirmedWords,
-            visits: imported.reduce((sum, work) => sum + work.visits, 0),
+            visits: imported.reduce(
+                (sum, work) => sum + effectiveVisits(work),
+                0,
+            ),
             authors: authors.filter((a) => a.value !== 'Anonymous').length,
             fandoms: fandoms.length,
             relationships: relationships.length,
@@ -141,7 +150,7 @@ export function computeStats(
             lastVisited,
         },
         wordSummary: core.summarize(readable.map((work) => work.words)),
-        visitSummary: core.summarize(imported.map((work) => work.visits)),
+        visitSummary: core.summarize(imported.map(effectiveVisits)),
         kudosSummary: core.summarize(readable.map((work) => work.kudos)),
         chapterSummary: core.summarize(
             readable.map((work) => work.chaptersPosted),
@@ -167,7 +176,7 @@ export function computeStats(
         characters,
         freeforms,
         series,
-        mostVisited: topWorks(readable, (w) => w.visits, TOP_WORKS),
+        mostVisited: topWorks(readable, effectiveVisits, TOP_WORKS),
         longest: topWorks(readable, (w) => w.words, TOP_WORKS),
         shortest: topWorks(readable, (w) => -w.words, TOP_WORKS),
         mostKudos: topWorks(readable, (w) => w.kudos, TOP_WORKS),

@@ -18,6 +18,7 @@ export type DashboardState = {
     reviewSessionAnswered: string[];
     /** The dashboard runs outside the extension (local preview). */
     standalone: boolean;
+    accountConnected: boolean;
     filter: WorkFilter;
     sync: SyncView;
     table: {

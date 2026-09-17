@@ -28,6 +28,7 @@ describe('smoke', () => {
         const app = document.createElement('div');
         document.body.append(app);
         await bootDashboard(app, {
+            demo: false,
             core: loadCore(),
             deps: { storage },
         });

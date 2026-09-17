@@ -42,7 +42,11 @@ describe('biggest reads review', () => {
         await saveLibrary(storage, library);
         const root = document.createElement('div');
         document.body.append(root);
-        await bootDashboard(root, { core: loadCore(), deps: { storage } });
+        await bootDashboard(root, {
+            demo: false,
+            core: loadCore(),
+            deps: { storage },
+        });
         await openReview(root);
         await vi.waitFor(() => {
             expect(
@@ -138,7 +142,11 @@ describe('biggest reads review', () => {
         if (!updated) throw new Error('Missing work');
         updated.words += 1000;
         await saveLibrary(storage, saved);
-        await bootDashboard(root, { core: loadCore(), deps: { storage } });
+        await bootDashboard(root, {
+            demo: false,
+            core: loadCore(),
+            deps: { storage },
+        });
         await openReview(root);
         await vi.waitFor(() => {
             expect(
