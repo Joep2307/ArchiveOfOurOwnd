@@ -73,7 +73,8 @@ describe('computeStats', () => {
         const ranked = computeStats(works, core, reviews).mostVisited;
         expect(ranked[0]?.key).toBe('14');
         expect(ranked[1]?.key).toBe('1');
-        expect(ranked.some((work) => work.key === '0')).toBe(false);
+        expect(ranked).toHaveLength(15);
+        expect(ranked.at(-1)?.key).toBe('0');
         const counts = ranked.map(
             (work) => reviews[work.key]?.readCount ?? work.visits,
         );

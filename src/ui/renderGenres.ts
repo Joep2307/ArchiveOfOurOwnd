@@ -5,6 +5,7 @@ import { renderBarList } from './charts';
 import { el } from './el';
 import { facetFromItem } from './facetFromItem';
 import { renderEmpty } from './renderEmpty';
+import { renderExpandableList } from './renderExpandableList';
 import { renderPanel } from './renderPanel';
 import { renderRankTools } from './renderRankTools';
 import { renderSection } from './renderSection';
@@ -35,12 +36,20 @@ export function renderGenres(context: ViewContext): HTMLElement {
         label: string,
         empty: string,
     ): HTMLElement =>
-        entries.length === 0
-            ? renderEmpty(empty)
-            : renderBarList(toChartItems(entries.slice(0, MAX_ROWS), facets), {
-                  label,
-                  onSelect: select,
-              });
+        renderExpandableList(
+            entries,
+            MAX_ROWS,
+            `genres-${label}`,
+            state,
+            controller,
+            (shown) =>
+                shown.length === 0
+                    ? renderEmpty(empty)
+                    : renderBarList(toChartItems(shown, facets), {
+                          label,
+                          onSelect: select,
+                      }),
+        );
 
     const [top, second] = stats.freeforms;
     const ratings = stats.ratings.filter(

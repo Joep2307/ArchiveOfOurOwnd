@@ -62,6 +62,28 @@ addons.mozilla.org.)
 
 ## On AO3 itself
 
+The extension estimates reading progress on AO3 fic pages using your saved
+words-per-minute pace. It counts time only while the tab is visible and
+focused, fic text is on screen, and you have interacted within two minutes.
+It pauses for hidden tabs, other windows, idle time, and computer sleep.
+Time is saved locally about every ten seconds and combines across visits
+and chapters. Notes, summaries, login screens and unrelated pages do not
+count. A small amount of time can be lost if the browser closes abruptly.
+
+After the expected reading time and reaching the end of every posted chapter,
+the dashboard labels a work **Likely finished**. Brief visits are **Just
+opened**; other tracked visits are **Partly read**. These remain estimates,
+not confirmed reads, and never create automatic reread counts. Manual reviews
+take priority. Your history needs to be synced before a newly opened fic
+appears in the dashboard; estimates refresh when you return to its tab.
+Changing your reading pace in Advanced recalculates the estimates. Tracking
+starts after loading this extension version and refreshing your AO3 tabs;
+it cannot reconstruct time spent before installation.
+
+Your approved localhost dashboard uses this same locally saved reading time.
+No password, story text, keystrokes, or browsing activity outside AO3 is stored
+by the reading-time tracker.
+
 While you browse archiveofourown.org, works that are in your synced
 History get a green bar and a small **Read** badge (hover it for the
 last visit date and number of visits). Links to read works in

@@ -1,7 +1,6 @@
 import type { Library } from '@/model';
 import { ACTIVE_USER_KEY } from './constants';
-import { isLibrary } from './isLibrary';
-import { libraryKey } from './libraryKey';
+import { loadLibrary } from './loadLibrary';
 import type { StorageArea } from './StorageArea';
 
 /** Loads the library of the account that was synced last. */
@@ -13,8 +12,5 @@ export async function loadActiveLibrary(
     if (typeof username !== 'string') {
         return null;
     }
-    const key = libraryKey(username);
-    const stored = await storage.get([key]);
-    const library = stored[key];
-    return isLibrary(library) ? library : null;
+    return loadLibrary(storage, username);
 }

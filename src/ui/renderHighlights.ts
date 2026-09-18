@@ -8,6 +8,7 @@ import { HIGHLIGHT_ROWS, VIEW_LINKS } from './constants';
 import { el } from './el';
 import { facetFromItem } from './facetFromItem';
 import { renderEmpty } from './renderEmpty';
+import { renderExpandableList } from './renderExpandableList';
 import { renderPanel } from './renderPanel';
 import { renderSection } from './renderSection';
 import { renderWorkList } from './renderWorkList';
@@ -26,21 +27,23 @@ function seeMore(view: DashboardView): HTMLElement {
 export function renderHighlights(context: ViewContext): HTMLElement {
     const { state, stats, controller } = context;
     const top = (entries: CountEntry[], label: string): HTMLElement =>
-        entries.length === 0
-            ? renderEmpty('Nothing here yet.')
-            : renderBarList(
-                  toChartItems(
-                      entries.slice(0, HIGHLIGHT_ROWS),
-                      state.filter.facets,
-                  ),
-                  {
-                      label,
-                      ranked: true,
-                      onSelect: (item: ChartItem) => {
-                          controller.toggleFacet(facetFromItem(item));
-                      },
-                  },
-              );
+        renderExpandableList(
+            entries,
+            HIGHLIGHT_ROWS,
+            `highlights-${label}`,
+            state,
+            controller,
+            (shown) =>
+                shown.length === 0
+                    ? renderEmpty('Nothing here yet.')
+                    : renderBarList(toChartItems(shown, state.filter.facets), {
+                          label,
+                          ranked: true,
+                          onSelect: (item: ChartItem) => {
+                              controller.toggleFacet(facetFromItem(item));
+                          },
+                      }),
+        );
 
     return renderSection(
         'highlights',
@@ -56,7 +59,7 @@ export function renderHighlights(context: ViewContext): HTMLElement {
         renderPanel(
             { title: 'Most visited', actions: seeMore('standouts') },
             renderWorkList(
-                stats.mostVisited.slice(0, HIGHLIGHT_ROWS),
+                stats.mostVisited,
                 (work) => {
                     const review = state.library?.reviews?.[work.key];
                     const visits =
@@ -68,6 +71,8 @@ export function renderHighlights(context: ViewContext): HTMLElement {
                 'Nothing yet.',
                 state,
                 controller,
+                'highlights-visits',
+                HIGHLIGHT_ROWS,
             ),
         ),
     );

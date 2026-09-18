@@ -42,6 +42,7 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 'Nothing yet.',
                 state,
                 controller,
+                'standouts-visits',
             ),
         ),
         renderPanel(
@@ -66,6 +67,7 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 'Nothing yet.',
                 state,
                 controller,
+                'standouts-length',
             ),
         ),
         renderPanel(
@@ -76,6 +78,7 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 'Nothing yet.',
                 state,
                 controller,
+                'standouts-kudos',
             ),
         ),
         renderPanel(
@@ -97,6 +100,7 @@ export function renderStandouts(context: ViewContext): HTMLElement {
                 'Re-read a work to see it here.',
                 state,
                 controller,
+                'standouts-gems',
             ),
         ),
     );

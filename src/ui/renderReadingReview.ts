@@ -26,10 +26,14 @@ export function renderReadingReview({
     );
     const biggest = reviewCandidates(works);
     const reviews = library?.reviews ?? {};
-    const reviewed = biggest.filter((work) => reviews[work.key]).length;
+    const reviewed = biggest.filter(
+        (work) =>
+            reviews[work.key] && reviews[work.key]?.source !== 'activity',
+    ).length;
     const pending = biggest.filter(
         (work) =>
             !reviews[work.key] ||
+            reviews[work.key]?.source === 'activity' ||
             state.reviewSessionAnswered.includes(work.key),
     );
     const totalWords = works.reduce((sum, work) => sum + work.words, 0);
@@ -41,7 +45,7 @@ export function renderReadingReview({
         const review = reviews[work.key];
         return (
             sum +
-            (review?.status === 'finished'
+            (review?.status === 'finished' && review.source !== 'activity'
                 ? review.words * (review.readCount ?? 1)
                 : 0)
         );
@@ -180,8 +184,16 @@ export function renderReadingReview({
                   )
                 : null,
             choices,
+            review?.source === 'activity'
+                ? el('p', {
+                      className: 'muted',
+                      text:
+                          'Suggested from your active reading time. ' +
+                          'Choose an answer to confirm or correct it.',
+                  })
+                : null,
             multipleReads,
-            review
+            review && review.source !== 'activity'
                 ? el('p', {
                       className: 'muted',
                       text: 'Saved. This work leaves the list when you close.',
@@ -193,6 +205,7 @@ export function renderReadingReview({
     const completed = works.filter(
         (work) =>
             reviews[work.key] &&
+            reviews[work.key]?.source !== 'activity' &&
             !pending.some((item) => item.key === work.key),
     );
     const history = el(

@@ -4,6 +4,8 @@ import { el } from './el';
 import { renderEmpty } from './renderEmpty';
 import { renderWorkTitle } from './renderWorkTitle';
 import type { DashboardController, DashboardState } from '@/app';
+import { activityLabel } from './activityLabel';
+import { renderExpandableList } from './renderExpandableList';
 
 export function reviewControl(
     work: Work,
@@ -97,6 +99,20 @@ export function reviewControl(
         el(
             'div',
             { className: 'work-list__review-controls' },
+            review?.source === 'activity'
+                ? el('p', {
+                      className: 'muted',
+                      text:
+                          `${Math.round((review.activeMs ?? 0) / 60000)} ` +
+                          'minutes active reading. Estimated: ' +
+                          (review.status === 'finished'
+                              ? 'likely finished.'
+                              : review.status === 'opened'
+                                ? 'just opened.'
+                                : 'partly read.') +
+                          ' You can correct this below.',
+                  })
+                : null,
             select,
             count,
             save,
@@ -111,7 +127,20 @@ export function renderWorkList(
     emptyText: string,
     state?: DashboardState,
     controller?: DashboardController,
+    listId?: string,
+    limit = 10,
 ): HTMLElement {
+    if (listId && state && controller) {
+        return renderExpandableList(
+            works,
+            limit,
+            listId,
+            state,
+            controller,
+            (shown) =>
+                renderWorkList(shown, metric, emptyText, state, controller),
+        );
+    }
     if (works.length === 0) {
         return renderEmpty(emptyText);
     }
@@ -126,6 +155,14 @@ export function renderWorkList(
                     'div',
                     { className: 'work-list__main' },
                     renderWorkTitle(work),
+                    state?.library?.reviews?.[work.key]?.source === 'activity'
+                        ? el('span', {
+                              className: 'work-list__meta',
+                              text: activityLabel(
+                                  state.library.reviews[work.key],
+                              ),
+                          })
+                        : null,
                     el('span', {
                         className: 'work-list__meta',
                         text: [authorLabel(work), work.fandoms.join(', ')]

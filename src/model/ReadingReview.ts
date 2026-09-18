@@ -6,4 +6,7 @@ export type ReadingReview = {
     reviewedAt: string;
     /** Full reads, independent of visits. Older finished reviews mean 1. */
     readCount?: number;
+    /** Missing for the reader's own answers. */
+    source?: 'activity';
+    activeMs?: number;
 };

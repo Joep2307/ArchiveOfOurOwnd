@@ -78,6 +78,10 @@ export function createDashboardController(
         const wordsPerMinute = clampWordsPerMinute(value);
         store.update({ wordsPerMinute });
         await saveWordsPerMinute(deps.storage, wordsPerMinute);
+        if (stored && !store.get().demo && !store.get().sync.running) {
+            stored = await loadLibrary(deps.storage, stored.username);
+            store.update({ library: shown(stored) });
+        }
     };
 
     const visibleWorks = (): Library['works'] => {
@@ -193,6 +197,7 @@ export function createDashboardController(
         },
 
         async load() {
+            await reviewQueue;
             const [library, highlightOnAo3, wordsPerMinute] =
                 await Promise.all([
                     loadActiveLibrary(deps.storage),
@@ -254,8 +259,12 @@ export function createDashboardController(
                         loadLibrary(deps.storage, username),
                     save: async (partial) => {
                         await saveLibrary(deps.storage, partial);
-                        stored = partial;
-                        store.update({ library: shown(partial) });
+                        stored =
+                            (await loadLibrary(
+                                deps.storage,
+                                partial.username,
+                            )) ?? partial;
+                        store.update({ library: shown(stored) });
                     },
                     onProgress: (progress) => {
                         setSync({ progress });

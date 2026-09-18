@@ -35,6 +35,12 @@ export function isLibrary(value: unknown): value is Library {
                         Number.isFinite(review.words) &&
                         review.words >= 0 &&
                         typeof review.reviewedAt === 'string' &&
+                        (!('source' in review) ||
+                            review.source === 'activity') &&
+                        (!('activeMs' in review) ||
+                            (typeof review.activeMs === 'number' &&
+                                Number.isFinite(review.activeMs) &&
+                                review.activeMs >= 0)) &&
                         (!('readCount' in review) ||
                             (typeof review.readCount === 'number' &&
                                 Number.isSafeInteger(review.readCount) &&

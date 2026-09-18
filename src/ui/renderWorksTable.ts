@@ -8,6 +8,7 @@ import { renderPanel } from './renderPanel';
 import { renderSection } from './renderSection';
 import { renderWorkTitle } from './renderWorkTitle';
 import { reviewControl } from './renderWorkList';
+import { activityLabel } from './activityLabel';
 import type { ViewContext } from './ViewContext';
 
 const PAGE_SIZE = 50;
@@ -34,11 +35,17 @@ const COLUMNS: Column[] = [
     {
         key: 'title',
         label: 'Title',
-        cell: (work) =>
+        cell: (work, { state }) =>
             el(
                 'div',
                 { className: 'cell-title' },
                 renderWorkTitle(work),
+                state.library?.reviews?.[work.key]?.source === 'activity'
+                    ? el('span', {
+                          className: 'muted',
+                          text: activityLabel(state.library.reviews[work.key]),
+                      })
+                    : null,
                 el('span', { className: 'muted', text: authorLabel(work) }),
             ),
     },

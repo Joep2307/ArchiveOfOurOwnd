@@ -58,7 +58,8 @@ export function renderOverview(
                 `${formatNumber(totals.estimatedWords)} estimated words. ` +
                 'Reviews update these stats. Not-read works are excluded; ' +
                 'unreviewed and uncertain works remain estimates. ' +
-                'All works and AO3 visits retain your imported history.',
+                'Active reading time adds estimates; your own reviews ' +
+                'provide confirmations.',
         }),
         el(
             'div',

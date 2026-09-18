@@ -71,7 +71,10 @@ function renderSpeedField(
     return renderPanel(
         {
             title: 'Reading speed',
-            subtitle: 'Used for the estimated reading time on the dashboard.',
+            subtitle:
+                'Used for reading-time estimates and automatic ' +
+                'reading detection on AO3. Only focused, visible reading ' +
+                'time counts; tracking pauses after two idle minutes.',
         },
         el(
             'form',

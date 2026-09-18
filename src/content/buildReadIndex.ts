@@ -12,6 +12,14 @@ export function buildReadIndex(
     const works = library ? hideRemoved(library).works : [];
     for (const work of works) {
         if (work.id !== null) {
+            const review = library?.reviews?.[work.key];
+            if (
+                review?.status === 'opened' ||
+                (review?.source === 'activity' && review.status !== 'finished')
+            ) {
+                index.delete(work.id);
+                continue;
+            }
             index.set(work.id, work);
         }
     }

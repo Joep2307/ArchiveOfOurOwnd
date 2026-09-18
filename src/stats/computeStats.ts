@@ -13,8 +13,6 @@ import type { Stats } from './Stats';
 import type { StatsCore } from './StatsCore';
 import { topWorks } from './topWorks';
 
-const TOP_WORKS = 10;
-
 function dateRange(works: readonly Work[]): [string | null, string | null] {
     const dates = works
         .map((work) => work.lastVisited)
@@ -67,7 +65,8 @@ export function computeStats(
         .filter((work) => reviews[work.key]?.status !== 'opened')
         .map((work) => {
             const review = reviews[work.key];
-            return review?.status === 'finished'
+            return review?.status === 'finished' ||
+                (review?.source === 'activity' && review.status === 'partial')
                 ? { ...work, words: review.words }
                 : work;
         });
@@ -104,7 +103,10 @@ export function computeStats(
     const confirmedWords = readable.reduce(
         (sum, work) =>
             sum +
-            (reviews[work.key]?.status === 'finished' ? wordsRead(work) : 0),
+            (reviews[work.key]?.status === 'finished' &&
+            reviews[work.key]?.source !== 'activity'
+                ? wordsRead(work)
+                : 0),
         0,
     );
     const complete = readable.filter((work) => work.complete).length;
@@ -176,14 +178,14 @@ export function computeStats(
         characters,
         freeforms,
         series,
-        mostVisited: topWorks(readable, effectiveVisits, TOP_WORKS),
-        longest: topWorks(readable, (w) => w.words, TOP_WORKS),
-        shortest: topWorks(readable, (w) => -w.words, TOP_WORKS),
-        mostKudos: topWorks(readable, (w) => w.kudos, TOP_WORKS),
+        mostVisited: topWorks(readable, effectiveVisits, readable.length),
+        longest: topWorks(readable, (w) => w.words, readable.length),
+        shortest: topWorks(readable, (w) => -w.words, readable.length),
+        mostKudos: topWorks(readable, (w) => w.kudos, readable.length),
         hiddenGems: topWorks(
             readable.filter(isReread),
             (w) => -w.kudos,
-            TOP_WORKS,
+            readable.length,
         ),
         busiestMonth,
     };

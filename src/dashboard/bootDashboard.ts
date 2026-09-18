@@ -127,6 +127,12 @@ export async function bootDashboard(
     }
 
     const params = new URLSearchParams(window.location.search);
+    window.addEventListener('focus', () => {
+        const state = store.get();
+        if (!state.demo && !state.sync.running && (!standalone || connected)) {
+            void controller.load().catch(() => undefined);
+        }
+    });
     const showDemo =
         options.demo ?? (!standalone && params.has(DEMO_QUERY_PARAM));
     if (showDemo) {

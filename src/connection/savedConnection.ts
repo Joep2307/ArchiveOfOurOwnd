@@ -25,9 +25,13 @@ export function savedConnection(storage: StorageArea, origin: string) {
                   )
                 : [];
             if (payload.operation === 'get') {
-                const items = await storage.get(keys.map(dataKey));
+                // Reading time is collected on AO3, shared with approved
+                // dashboards; each dashboard keeps its own manual reviews.
+                const readKey = (key: string): string =>
+                    key.startsWith('readingActivity:') ? key : dataKey(key);
+                const items = await storage.get(keys.map(readKey));
                 return Object.fromEntries(
-                    keys.map((key) => [key, items[dataKey(key)]]),
+                    keys.map((key) => [key, items[readKey(key)]]),
                 );
             }
             if (payload.operation === 'set') {
