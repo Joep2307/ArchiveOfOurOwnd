@@ -26,6 +26,8 @@ async function readVersion(): Promise<string> {
 
 async function writeTargets(version: string): Promise<void> {
     const source = resolve(DIST, 'chrome');
+    // The website serves the dashboard at "/", so it needs an index.
+    await cp(resolve(source, 'dashboard.html'), resolve(source, 'index.html'));
     for (const target of TARGETS) {
         const folder = resolve(DIST, target);
         if (target !== 'chrome') {
